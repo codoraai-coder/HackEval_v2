@@ -1,0 +1,216 @@
+/* Fixed sidebar always visible */
+.sidebar {
+  width: 280px;
+  background: linear-gradient(135deg, #ffffff 70%, #80bdfd 100%);
+  border-right: 1px solid var(--gray-200);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  height: calc(100vh - 70px); /* Adjust height to account for header */
+  top: 70px; /* Position below the header */
+  left: 0;
+  overflow-y: auto;
+  z-index: 10;
+  box-shadow: 2px 0 16px 0 rgba(27, 67, 50, 0.08);
+}
+
+
+/* No transform needed, sidebar is always visible */
+.sidebar.sidebar-open {
+}
+
+
+.sidebar-header {
+  padding: 2rem 1.5rem 1.5rem;
+  border-bottom: 1px solid var(--gray-200);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sidebar-close {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+  color: var(--gray-600);
+  transition: background-color 0.2s ease;
+}
+
+.sidebar-close:hover {
+  background-color: var(--gray-100);
+  color: var(--primary-green);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logo-text h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary-green);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.logo-text p {
+  font-size: 0.875rem;
+  color: var(--gray-600);
+  margin: 0;
+  font-weight: 500;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 1.5rem 0;
+}
+
+.nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-list li {
+  margin: 0;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  padding: 0.875rem 1.5rem;
+  color: var(--gray-700);
+  text-decoration: none;
+  transition: all 0.2s;
+  border-left: 3px solid transparent;
+  gap: 0.75rem;
+  border-radius: 0.5rem 0 0 0.5rem;
+}
+
+.nav-link:hover {
+  background: var(--light-green);
+  color: var(--primary-green);
+  border-left-color: var(--primary-green);
+  box-shadow: 0 2px 8px 0 rgba(27, 67, 50, 0.06);
+}
+
+.nav-link.active {
+  background: linear-gradient(90deg, #80bdfd 60%, #ffffff 100%);
+  color: var(--primary-green);
+  border-left-color: var(--primary-green);
+  font-weight: 700;
+  box-shadow: 0 4px 16px 0 rgba(27, 67, 50, 0.10);
+}
+
+.nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+}
+
+.nav-label {
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+.sidebar-footer {
+  padding: 1.5rem;
+  border-top: 1px solid var(--gray-200);
+  background-color: var(--gray-50);
+}
+
+.judge-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.judge-avatar {
+  width: 40px;
+  height: 40px;
+  background-color: var(--primary-green);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+}
+
+.judge-details {
+  flex: 1;
+}
+
+.judge-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--gray-900);
+  margin: 0 0 0.25rem 0;
+}
+
+.judge-role {
+  font-size: 0.75rem;
+  color: var(--gray-600);
+  margin: 0;
+}
+
+/* Logout button styles */
+.logout-section {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--gray-200);
+  border-bottom: 1px solid var(--gray-200);
+  margin: 1rem 0;
+}
+
+.logout-button {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.875rem 1rem;
+  background-color: white;
+  border: 1px solid white;
+  color: black;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.logout-button:hover {
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+    border-right: none;
+    border-bottom: 1px solid var(--gray-200);
+    box-shadow: none;
+  }
+  .sidebar-header {
+    padding: 1rem;
+  }
+  .logo-text h2 {
+    font-size: 1.125rem;
+  }
+  .nav-link {
+    padding: 0.75rem 1rem;
+  }
+  .sidebar-footer {
+    padding: 1rem;
+  }
+  .sidebar-close {
+    display: block;
+  }
+}

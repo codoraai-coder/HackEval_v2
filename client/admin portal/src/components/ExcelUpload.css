@@ -1,0 +1,836 @@
+/* Advanced CSS Variables for Dynamic Theming - Updated Color Scheme */
+:root {
+  --primary-gradient: linear-gradient(135deg, #000000 0%, #000000 50%, #000000 100%);
+  --secondary-gradient: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+  --success-gradient: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  --error-gradient: linear-gradient(135deg, #dc2626 0%, #f59e0b 100%);
+  --warning-gradient: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+  --glass-background: rgba(255, 255, 255, 0.25);
+  --glass-border: rgba(255, 255, 255, 0.18);
+  --shadow-light: 0 8px 32px 0 rgba(79, 70, 229, 0.37);
+  --shadow-heavy: 0 20px 60px 0 rgba(79, 70, 229, 0.5);
+  --blur-amount: 40px;
+}
+
+/* Enhanced Container with Animated Background */
+.excel-upload-container {
+    max-width: 100%;
+    margin: 10;
+    padding: 5rem;
+    min-height: 100vh;
+    background: 
+        radial-gradient(ellipse at top, rgba(54, 80, 174, 0.3), transparent),
+        radial-gradient(ellipse at bottom, rgba(124, 58, 237, 0.3), transparent),
+        linear-gradient(135deg, #fefefe 0%, #797979 50%, #1a1a1a 100%);
+    background-size: 100% 200%;
+    animation: gradientShift 10s ease infinite;
+    position: relative;
+    overflow-x: hidden;
+}
+
+@keyframes gradientShift {
+    0%, 100% { background-position: 0% 0%; }
+    50% { background-position: 0% 100%; }
+}
+
+/* Floating Particles Background */
+.excel-upload-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.3), transparent),
+        radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.2), transparent),
+        radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.4), transparent),
+        radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.3), transparent),
+        radial-gradient(2px 2px at 160px 30px, rgba(255,255,255,0.2), transparent);
+    background-repeat: repeat;
+    background-size: 200px 100px;
+    animation: particleFloat 20s linear infinite;
+    pointer-events: none;
+    z-index: 1;
+}
+
+@keyframes particleFloat {
+    from { transform: translateY(0px); }
+    to { transform: translateY(-200px); }
+}
+
+/* Ultra-Modern Glass Card */
+.excel-upload-card {
+    background: var(--glass-background);
+    backdrop-filter: blur(var(--blur-amount));
+    -webkit-backdrop-filter: blur(var(--blur-amount));
+    border-radius: 2rem;
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-heavy);
+    padding: 3rem;
+    position: relative;
+    z-index: 2;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+}
+
+.excel-upload-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--primary-gradient);
+    transform: translateX(-100%);
+    animation: cardTopLine 3s ease-in-out infinite;
+}
+
+@keyframes cardTopLine {
+    0%, 100% { transform: translateX(-100%); }
+    50% { transform: translateX(100%); }
+}
+
+.excel-upload-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 30px 80px 0 rgba(16, 14, 51, 0.6);
+}
+
+/* Dynamic 3D Title */
+.excel-upload-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 2rem;
+    text-align: center;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    position: relative;
+    /* text-transform: uppercase; */
+    letter-spacing: 2px;
+    animation: titleGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes titleGlow {
+    from { 
+        filter: drop-shadow(0 0 10px rgba(79, 70, 229, 0.5));
+        transform: perspective(500px) rotateX(0deg);
+    }
+    to { 
+        filter: drop-shadow(0 0 20px rgba(124, 58, 237, 0.8));
+        transform: perspective(500px) rotateX(2deg);
+    }
+}
+
+/* Futuristic Instructions Box */
+.instructions-box {
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.1) 0%, 
+        rgba(255, 255, 255, 0.05) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 1.5rem;
+    padding: 2rem;
+    margin-bottom: 2.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s ease;
+}
+
+.instructions-box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--primary-gradient);
+    border-radius: 1.5rem 1.5rem 0 0;
+}
+
+.instructions-box::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.1), transparent);
+    animation: instructionsRotate 8s linear infinite;
+    z-index: -1;
+}
+
+@keyframes instructionsRotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.instructions-box:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(79, 70, 229, 0.2);
+}
+
+.instructions-title {
+    color: #4338ca;
+    font-weight: 700;
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.instructions-title::before {
+    content: '📋';
+    font-size: 1.5rem;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-10px); }
+    60% { transform: translateY(-5px); }
+}
+
+.instructions-list {
+    list-style: none;
+    padding: 0;
+    font-size: 1rem;
+    color: #2d3748;
+    line-height: 1.8;
+}
+
+.instructions-list > li {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 0.75rem;
+    border-left: 4px solid var(--primary-gradient);
+    position: relative;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.instructions-list > li:hover {
+    transform: translateX(5px);
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 5px 15px rgba(79, 70, 229, 0.2);
+}
+
+.instructions-list > li::before {
+    content: counter(instruction-counter);
+    counter-increment: instruction-counter;
+    position: absolute;
+    left: -15px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 30px;
+    background: var(--primary-gradient);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+}
+
+.instructions-list {
+    counter-reset: instruction-counter;
+}
+
+.instructions-sublist {
+    margin: 1rem 0 0 0;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 0.5rem;
+    list-style: none;
+}
+
+.instructions-sublist li {
+    margin-bottom: 0.5rem;
+    padding: 0.5rem 0 0.5rem 2rem;
+    position: relative;
+    font-size: 0.9rem;
+    color: #4a5568;
+    transition: all 0.3s ease;
+}
+
+.instructions-sublist li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--primary-gradient);
+    font-weight: bold;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.instructions-sublist li:hover {
+    color: #2d3748;
+    transform: translateX(5px);
+}
+
+.instructions-sublist li:hover::before {
+    transform: scale(1.2);
+}
+
+/* Revolutionary Upload Area */
+.upload-section {
+    margin-bottom: 2.5rem;
+}
+
+.mb-6 > div {
+    border: 3px dashed transparent;
+    border-radius: 2rem;
+    padding: 4rem 2rem;
+    text-align: center;
+    background: 
+        linear-gradient(white, white) padding-box,
+        var(--primary-gradient) border-box;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+}
+
+.mb-6 > div::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(
+        from 0deg,
+        transparent,
+        rgba(79, 70, 229, 0.1),
+        rgba(124, 58, 237, 0.1),
+        transparent
+    );
+    animation: uploadAreaRotate 10s linear infinite;
+    z-index: -1;
+}
+
+@keyframes uploadAreaRotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.mb-6 > div:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 25px 50px rgba(79, 70, 229, 0.3);
+}
+
+.mb-6 > div:hover::before {
+    animation-duration: 3s;
+}
+
+/* Dynamic File Input Label */
+label[for="file-upload"] {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+    position: relative;
+    z-index: 2;
+}
+
+label[for="file-upload"]:hover {
+    transform: scale(1.05);
+}
+
+/* Animated Upload Icon */
+label[for="file-upload"] svg {
+    width: 5rem;
+    height: 5rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.4s ease;
+    filter: drop-shadow(0 4px 8px rgba(79, 70, 229, 0.3));
+}
+
+label[for="file-upload"]:hover svg {
+    transform: rotateY(180deg) scale(1.1);
+    filter: drop-shadow(0 8px 16px rgba(79, 70, 229, 0.5));
+}
+
+/* Enhanced Loading Animation */
+.animate-pulse {
+    position: relative;
+}
+
+.animate-pulse::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100px;
+    height: 100px;
+    border: 3px solid transparent;
+    border-top: 3px solid var(--primary-gradient);
+    border-radius: 50%;
+    animation: loadingSpin 1s linear infinite;
+}
+
+@keyframes loadingSpin {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Ultra-Modern Submit Button - Right Aligned */
+.submit-btn-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 2rem;
+    gap: 1rem;
+}
+
+.submit-btn {
+    background: var(--primary-gradient) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 1rem !important;
+    padding: 1.25rem 3rem !important;
+    font-weight: 700 !important;
+    font-size: 1.1rem !important;
+    cursor: pointer !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    position: relative !important;
+    overflow: hidden !important;
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1) !important;
+    box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4) !important;
+    opacity: 1 !important;
+    margin-left: auto !important;
+}
+
+.submit-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: all 0.6s ease;
+}
+
+.submit-btn:hover:not(:disabled)::before {
+    width: 300px;
+    height: 300px;
+}
+
+.submit-btn:hover:not(:disabled) {
+    transform: translateY(-5px) scale(1.05) !important;
+    box-shadow: 0 15px 40px rgba(79, 70, 229, 0.6) !important;
+}
+
+.submit-btn:disabled {
+    opacity: 0.6 !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+    box-shadow: 0 4px 15px rgba(79, 70, 229, 0.2) !important;
+}
+
+/* Advanced Data Table */
+.data-table-section {
+    margin-top: 3rem;
+    animation: tableSlideIn 0.8s ease-out;
+}
+
+@keyframes tableSlideIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.table-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    text-align: center;
+    background: var(--secondary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    position: relative;
+}
+
+.table-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 3px;
+    background: var(--secondary-gradient);
+    border-radius: 2px;
+}
+
+.table-container {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border-radius: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+    box-shadow: var(--shadow-light);
+    position: relative;
+}
+
+.table-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--secondary-gradient);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table-header {
+    background: var(--primary-gradient);
+    position: relative;
+}
+
+.table-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.table-header th {
+    padding: 1.5rem;
+    text-align: left;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: white;
+    letter-spacing: 1px;
+    border: none;
+    position: relative;
+}
+
+.table-header th::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 25%;
+    bottom: 25%;
+    width: 1px;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.table-header th:last-child::after {
+    display: none;
+}
+
+.table-row {
+    background: rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.table-row::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    height: 2px;
+    background: var(--secondary-gradient);
+    transition: width 0.3s ease;
+}
+
+.table-row:nth-child(even) {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.table-row:hover {
+    background: linear-gradient(135deg, 
+        rgba(79, 70, 229, 0.15) 0%, 
+        rgba(124, 58, 237, 0.15) 100%) !important;
+    transform: scale(1.02);
+    box-shadow: 0 5px 20px rgba(79, 70, 229, 0.2);
+    z-index: 1;
+}
+
+.table-row:hover::after {
+    width: 100%;
+}
+
+.table-cell {
+    padding: 1.25rem 1.5rem;
+    font-size: 0.95rem;
+    color: #2d3748;
+    border: none;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.table-cell::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 20%;
+    bottom: 20%;
+    width: 1px;
+    background: rgba(226, 232, 240, 0.3);
+}
+
+.table-cell:last-child::after {
+    display: none;
+}
+
+/* Enhanced Status Messages */
+.upload-status {
+    padding: 2rem;
+    margin-bottom: 2.5rem;
+    border-radius: 1.5rem;
+    border: none;
+    font-size: 1rem;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(20px);
+    animation: statusSlideIn 0.5s ease-out;
+}
+
+@keyframes statusSlideIn {
+    from { opacity: 0; transform: translateX(-100%); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.upload-status::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    border-radius: 1.5rem 1.5rem 0 0;
+}
+
+.upload-status.success {
+    background: linear-gradient(135deg, 
+        rgba(5, 150, 105, 0.1) 0%, 
+        rgba(16, 185, 129, 0.1) 100%);
+    color: #065f46;
+    border: 1px solid rgba(5, 150, 105, 0.3);
+}
+
+.upload-status.success::before {
+    background: var(--success-gradient);
+}
+
+.upload-status.error {
+    background: linear-gradient(135deg, 
+        rgba(220, 38, 38, 0.1) 0%, 
+        rgba(245, 158, 11, 0.1) 100%);
+    color: #7f1d1d;
+    border: 1px solid rgba(220, 38, 38, 0.3);
+}
+
+.upload-status.error::before {
+    background: var(--error-gradient);
+}
+
+/* Enhanced Detail Sections */
+.skipped-details,
+.upload-details,
+.error-details {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.skipped-details strong,
+.error-details strong {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.skipped-details strong::before {
+    content: '⚠️';
+    font-size: 1.2rem;
+}
+
+.error-details strong::before {
+    content: '❌';
+    font-size: 1.2rem;
+}
+
+.skipped-details ul,
+.error-details ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.skipped-details li,
+.error-details li {
+    margin-bottom: 0.75rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 0.5rem;
+    border-left: 3px solid currentColor;
+    line-height: 1.6;
+    transition: all 0.3s ease;
+}
+
+.skipped-details li:hover,
+.error-details li:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(5px);
+}
+
+/* Responsive Enhancements */
+@media (max-width: 768px) {
+    .excel-upload-container {
+        padding: 1rem;
+    }
+    
+    .excel-upload-card {
+        padding: 2rem;
+        border-radius: 1.5rem;
+    }
+    
+    .excel-upload-title {
+        font-size: 1.8rem;
+        letter-spacing: 1px;
+    }
+    
+    .mb-6 > div {
+        padding: 3rem 1rem;
+    }
+    
+    label[for="file-upload"] svg {
+        width: 4rem;
+        height: 4rem;
+    }
+    
+    .submit-btn-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .submit-btn {
+        padding: 1rem 2rem !important;
+        font-size: 1rem !important;
+        margin-left: 0 !important;
+    }
+    
+    .table-container {
+        font-size: 0.8rem;
+        border-radius: 1rem;
+    }
+    
+    .table-header th,
+    .table-cell {
+        padding: 1rem;
+    }
+    
+    .instructions-box {
+        padding: 1.5rem;
+    }
+    
+    .instructions-list > li {
+        padding: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .excel-upload-title {
+        font-size: 1.5rem;
+    }
+    
+    .instructions-title {
+        font-size: 1.1rem;
+    }
+    
+    .mb-6 > div {
+        padding: 2rem 0.5rem;
+    }
+    
+    .table-header th,
+    .table-cell {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* Custom Scrollbar for Modern Look */
+.table-container::-webkit-scrollbar {
+    height: 10px;
+    width: 10px;
+}
+
+.table-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background: var(--primary-gradient);
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+    background: var(--secondary-gradient);
+    transform: scale(1.1);
+}
+
+.table-container::-webkit-scrollbar-corner {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Performance Optimizations */
+* {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+/* Accessibility Enhancements */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Focus States for Accessibility */
+.submit-btn:focus,
+label[for="file-upload"]:focus-within {
+    outline: 3px solid rgba(236, 72, 153, 0.6);
+    outline-offset: 2px;
+}
+
+input[type="file"]:focus + label {
+    outline: 3px solid rgba(236, 72, 153, 0.6);
+    outline-offset: 2px;
+}

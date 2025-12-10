@@ -1,0 +1,107 @@
+# ============================================
+# GLOBAL IGNORE (Python + Node + React + IDE)
+# ============================================
+
+# --- ENV FILES ---
+.env
+.env.*
+*.env
+*.key
+*.pem
+*.secret
+secrets/
+config.local.json
+
+# --- PYTHON ENVIRONMENTS ---
+venv/
+env/
+.venv/
+.pyenv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+
+# --- PYTHON BUILD FILES ---
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# --- JUPYTER NOTEBOOK Checkpoints ---
+.ipynb_checkpoints/
+
+# --- FASTAPI / DJANGO / FLASK ---
+*.db
+instance/
+media/
+staticfiles/
+logs/
+*.sqlite3
+
+# --- NODE / REACT / NEXT.JS ---
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+.pnpm-store/
+.next/
+out/
+dist/
+build/
+
+# --- TYPESCRIPT ---
+*.tsbuildinfo
+
+# --- FRONTEND BUILD FILES ---
+.DS_Store
+*.log
+*.cache
+.cache/
+.parcel-cache/
+.svelte-kit/
+.vite/
+vite.config.ts.timestamp*
+
+# --- DOCKER ---
+docker-data/
+*.pid
+
+# --- IDE & SYSTEM FILES ---
+.vscode/
+.idea/
+*.swp
+*.swo
+Thumbs.db
+Desktop.ini
+
+# --- TESTING ---
+coverage/
+htmlcov/
+.nox/
+.tox/
+pytest_cache/
+
+# --- OTHER ---
+*.zip
+*.tar.gz
+*.tgz
+*.bak
+*.old
+
+# --- MODELS / DATA FILES ---
+models/
+checkpoints/
+*.bin
+*.h5
+*.pt
+*.ckpt
+*.onnx
+data/
+datasets/
+
+# ============================================
+# END OF FILE
+# ============================================

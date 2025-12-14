@@ -1,1 +1,1 @@
-export const DB_NAME = "hackathon_eval";
+export const DB_NAME = "HackEval";

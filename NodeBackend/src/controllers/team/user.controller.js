@@ -5,11 +5,9 @@ import { Team } from "../../models/team/user.model.js";
 import jwt from "jsonwebtoken";
 
 const generateAccessToken = (teamId) => {
-  return jwt.sign(
-    { teamId },
-    process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: process.env.ACCESS_TOKEN_EXPIRY || '24h' }
-  );
+  return jwt.sign({ teamId }, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: process.env.ACCESS_TOKEN_EXPIRY || "24h",
+  });
 };
 
 const teamRegister = asyncHandler(async (req, res) => {
@@ -21,7 +19,7 @@ const teamRegister = asyncHandler(async (req, res) => {
     projectTitle,
     projectDescription,
     technologyStack,
-    category
+    category,
   } = req.body;
 
   // Validation
@@ -35,7 +33,7 @@ const teamRegister = asyncHandler(async (req, res) => {
 
   // Check if team already exists
   const existingTeam = await Team.findOne({
-    $or: [{ teamName }, { email }]
+    $or: [{ teamName }, { email }],
   });
 
   if (existingTeam) {
@@ -51,7 +49,7 @@ const teamRegister = asyncHandler(async (req, res) => {
     projectTitle,
     projectDescription,
     technologyStack,
-    category
+    category,
   });
 
   const createdTeam = await Team.findById(team._id);
@@ -67,52 +65,53 @@ const teamRegister = asyncHandler(async (req, res) => {
       201,
       {
         team: createdTeam,
-        accessToken: token
+        accessToken: token,
       },
-      "Team registered successfully"
-    )
+      "Team registered successfully",
+    ),
   );
 });
 
 const teamLogin = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
+  console.log(email);
 
   if (!email || !password) {
     throw new ApiError(400, "Email and password are required");
   }
 
   const team = await Team.findOne({ email });
+  console.log("Team:", team);
   if (!team) {
+    console.log("Team not found");
     throw new ApiError(404, "Team not found");
   }
 
   const isPasswordValid = await team.comparePassword(password);
   if (!isPasswordValid) {
+    console.log("Invalid credentials");
     throw new ApiError(401, "Invalid credentials");
   }
 
   const token = generateAccessToken(team._id);
+  console.log("Team Login, Token Generated", token);
 
   return res.status(200).json(
     new ApiResponse(
       200,
       {
         team,
-        accessToken: token
+        accessToken: token,
       },
-      "Login successful"
-    )
+      "Login successful",
+    ),
   );
 });
 
 const getCurrentTeam = asyncHandler(async (req, res) => {
-  return res.status(200).json(
-    new ApiResponse(200, req.team, "Team retrieved successfully")
-  );
+  return res
+    .status(200)
+    .json(new ApiResponse(200, req.team, "Team retrieved successfully"));
 });
 
-export {
-  teamRegister,
-  teamLogin,
-  getCurrentTeam
-};
+export { teamRegister, teamLogin, getCurrentTeam };

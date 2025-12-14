@@ -31,34 +31,38 @@ const SignIn = () => {
     setLoading(true);
 
     try {
-      // 1. POST to backend
-      const response = await fetch(`${API_BASE_URL}/auth/team_login/`, {
+      // Use correct endpoint: backend exposes /team/team_login
+      const response = await fetch(`${API_BASE_URL}/team/team_login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
-      // 2. Parse response
-      const data = await response.json();
-      console.log("Login response:", data);
+      const payload = await response.json();
+      // payload is ApiResponse: { statusCode, data: { team, accessToken }, message, success }
 
-      if (!response.ok) {
-        throw new Error(data.detail || "Login failed");
+      if (!response.ok || !payload.success) {
+        // Prefer backend's message when available
+        const backendMessage = payload?.message || "Login failed";
+        throw new Error(backendMessage);
       }
 
-      // 3. Check if team data is present
-      if (!data.team) {
+      // Validate presence of data.team and data.accessToken
+      const { team, accessToken } = payload.data || {};
+      if (!team || !accessToken) {
         throw new Error(
-          "Team data not returned from backend. Please contact admin.",
+          "Invalid response from server: missing team or access token",
         );
       }
 
-      // 4. Save to localStorage and context
-      localStorage.setItem("team", JSON.stringify(data.team));
-      localStorage.setItem("token", data.access_token);
-  setTeam(data.team);
-  toast.success("Signed in successfully");
-  navigate("/");
+      // Persist auth data
+      localStorage.setItem("team", JSON.stringify(team));
+      localStorage.setItem("token", accessToken);
+
+      // Update context and navigate
+      setTeam(team);
+      toast.success("Signed in successfully");
+      navigate("/");
     } catch (err) {
       setError(err.message);
       toast.error(err.message);

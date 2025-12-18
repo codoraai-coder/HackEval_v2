@@ -20,25 +20,49 @@ const teamRegister = asyncHandler(async (req, res) => {
     projectDescription,
     technologyStack,
     category,
+    subcategory,
+    universityRollNo,
+    problemStatement, // optional; may be provided by frontend
   } = req.body;
 
   // Validation
   if (!teamName || !email || !password) {
     throw new ApiError(400, "Team name, email, and password are required");
   }
-
   if (!members || members.length === 0) {
     throw new ApiError(400, "At least one team member is required");
   }
 
-  // Check if team already exists
-  const existingTeam = await Team.findOne({
-    $or: [{ teamName }, { email }],
-  });
-
+  // Uniqueness
+  const existingTeam = await Team.findOne({ $or: [{ teamName }, { email }] });
   if (existingTeam) {
     throw new ApiError(409, "Team with this name or email already exists");
   }
+
+  // Build a normalized problemStatement if not provided
+  const normalizedPS =
+    problemStatement && typeof problemStatement === "object"
+      ? {
+          title: problemStatement.title || projectTitle || "",
+          description: problemStatement.description || projectDescription || "",
+          category: problemStatement.category || category || "",
+          ps_id: problemStatement.ps_id || "", // optional
+        }
+      : {
+          title: projectTitle || "",
+          description: projectDescription || "",
+          category: category || "",
+          ps_id: "",
+        };
+
+  // Ensure first member is leader server-side as well
+  const normalizedMembers = members.map((m, i) => ({
+    name: m.name,
+    email: m.email,
+    phone: m.phone,
+    rollNo: m.rollNo || "",
+    isLeader: i === 0,
+  }));
 
   // Create team
   const team = await Team.create({
@@ -50,6 +74,9 @@ const teamRegister = asyncHandler(async (req, res) => {
     projectDescription,
     technologyStack,
     category,
+    subcategory,
+    universityRollNo,
+    problemStatement: normalizedPS,
   });
 
   const createdTeam = await Team.findById(team._id);
@@ -57,19 +84,18 @@ const teamRegister = asyncHandler(async (req, res) => {
     throw new ApiError(500, "Something went wrong while registering the team");
   }
 
-  // Generate token
   const token = generateAccessToken(createdTeam._id);
 
-  return res.status(201).json(
-    new ApiResponse(
-      201,
-      {
-        team: createdTeam,
-        accessToken: token,
-      },
-      "Team registered successfully",
-    ),
-  );
+  // createdTeam.toJSON removes password
+  return res
+    .status(201)
+    .json(
+      new ApiResponse(
+        201,
+        { team: createdTeam.toJSON(), accessToken: token },
+        "Team registered successfully",
+      ),
+    );
 });
 
 const teamLogin = asyncHandler(async (req, res) => {

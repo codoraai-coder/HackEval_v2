@@ -69,7 +69,7 @@ const teamRegister = asyncHandler(async (req, res) => {
     teamName,
     email,
     password,
-    members,
+    members: normalizedMembers,
     projectTitle,
     projectDescription,
     technologyStack,
@@ -100,14 +100,12 @@ const teamRegister = asyncHandler(async (req, res) => {
 
 const teamLogin = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
-  console.log(email);
 
   if (!email || !password) {
     throw new ApiError(400, "Email and password are required");
   }
 
   const team = await Team.findOne({ email });
-  console.log("Team:", team);
   if (!team) {
     console.log("Team not found");
     throw new ApiError(404, "Team not found");

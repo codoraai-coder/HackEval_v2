@@ -1,269 +1,188 @@
 import React, { useState, useEffect } from "react";
 import "./Submission.css";
+import { API_BASE_URL } from "../config";
 
 const Submissions = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [statusMessage, setStatusMessage] = useState("");
+  const [analysis, setAnalysis] = useState(null);
 
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
+  useEffect(() => {}, []);
 
-  const handleGoogleForm = async () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      window.open("https://forms.gle/UmcmyMqyq5kZF7SD7", "_blank");
-      setIsLoading(false);
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 3000);
-    }, 500);
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    setSelectedFile(file || null);
   };
 
-  const mockSubmissions = [
-    {
-      id: 1,
-      title: "Initial Project Proposal",
-      submittedAt: "2024-03-15 14:30",
-      status: "Reviewed",
-      feedback:
-        "Great initial concept! Please expand on the technical implementation details in your next submission.",
-    },
-    {
-      id: 2,
-      title: "Technical Documentation",
-      submittedAt: "2024-03-18 09:15",
-      status: "Pending Review",
-      feedback: null,
-    },
-    {
-      id: 3,
-      title: "Prototype Demo",
-      submittedAt: "2024-03-20 16:45",
-      status: "Approved",
-      feedback:
-        "Excellent work! The prototype demonstrates strong technical skills and innovation.",
-    },
-  ];
+  const submitFile = async () => {
+    if (!selectedFile) {
+      setStatusMessage("Please select a PPT/PDF file first.");
+      return;
+    }
+    setIsLoading(true);
+    setStatusMessage("");
+    setShowSuccess(false);
 
-  const getStatusColor = (status) => {
-    switch (status.toLowerCase()) {
-      case "approved":
-        return "#22c55e";
-      case "pending review":
-        return "#ffc107";
-      case "reviewed":
-        return "#17a2b8";
-      default:
-        return "#6c757d";
+    try {
+      const token = localStorage.getItem("token");
+      const team = JSON.parse(localStorage.getItem("team") || "{}");
+      if (!team?._id || !token) {
+        setStatusMessage("No authenticated session. Please sign in.");
+        setIsLoading(false);
+        return;
+      }
+
+      const leaderEmail =
+        (team.members || []).find((m) => m.isLeader)?.email || team.email;
+      const fd = new FormData();
+      fd.append("pptFile", selectedFile);
+      fd.append("leaderEmail", leaderEmail);
+
+      const res = await fetch(
+        `${API_BASE_URL}/team/team-ppt/${team._id}/submit-ppt`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          body: fd,
+        },
+      );
+      const payload = await res.json();
+      if (!res.ok || !payload?.success) {
+        throw new Error(payload?.message || "Upload failed");
+      }
+
+      setShowSuccess(true);
+      setStatusMessage(
+        "File uploaded and queued for evaluation. Check back for analysis.",
+      );
+      setTimeout(() => setShowSuccess(false), 3000);
+    } catch (e) {
+      setStatusMessage(e.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const getStatusEmoji = (status) => {
-    switch (status.toLowerCase()) {
-      case "approved":
-        return "✅";
-      case "pending review":
-        return "⏳";
-      case "reviewed":
-        return "👁️";
-      default:
-        return "📄";
+  const checkAnalysis = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const team = JSON.parse(localStorage.getItem("team") || "{}");
+      if (!team?._id || !token) {
+        setStatusMessage("No authenticated session. Please sign in.");
+        return;
+      }
+      const res = await fetch(
+        `${API_BASE_URL}/team/team-ppt/${team._id}/ppt-analysis`,
+        {
+          method: "GET",
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      const payload = await res.json();
+      if (!res.ok || !payload?.success) {
+        throw new Error(payload?.message || "Failed to load analysis");
+      }
+      setAnalysis(payload.data?.pptSubmission || null);
+      setStatusMessage("");
+    } catch (e) {
+      setStatusMessage(e.message);
     }
   };
 
   return (
     <div className="submissions-page">
-      <div className={`submissions-container ${isVisible ? "visible" : ""}`}>
+      <div className="submissions-container">
         <h1>Project Submissions</h1>
 
         <div className="submission-upload">
           <h2>Submit Your Project</h2>
           <p className="upload-description">
-            Ready to submit your project? Click the button below to access our
-            submission form. Make sure you have all your project files and
-            documentation ready!
+            Upload your PPT/PDF. We’ll analyze it and show the results here.
           </p>
+
+          <input
+            type="file"
+            accept=".ppt,.pptx,.pdf,application/pdf,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation"
+            onChange={handleFileChange}
+            disabled={isLoading}
+            style={{ marginBottom: 16 }}
+          />
 
           <button
             className={`google-form-btn ${isLoading ? "loading" : ""}`}
-            onClick={handleGoogleForm}
-            disabled={isLoading}
+            onClick={submitFile}
+            disabled={isLoading || !selectedFile}
           >
             {isLoading ? (
               <>
                 <span className="loading"></span>
-                Opening Form...
+                Uploading...
               </>
             ) : (
-              <>🚀 Go to Submission Form</>
+              <>🚀 Upload and Analyze</>
             )}
           </button>
 
           {showSuccess && (
             <div className="success-message">
-              ✨ Submission form opened successfully! Complete your submission
-              there.
+              ✨ File uploaded! We’re processing it. You can check the analysis
+              below.
             </div>
           )}
 
-          <div className="submission-info-cards">
-            <div className="info-card">
-              <div className="info-icon">📋</div>
-              <h4>Prepare Documents</h4>
-              <p>Have your project files, documentation, and presentation ready</p>
-            </div>
-            <div className="info-card">
-              <div className="info-icon">⚡</div>
-              <h4>Quick Submission</h4>
-              <p>Our streamlined form makes submission fast and easy</p>
-            </div>
-            {/* <div className="info-card">
-              <div className="info-icon">🔒</div>
-              <h4>Secure Upload</h4>
-              <p>All submissions are securely stored and processed</p>
-            </div> */}
-          </div>
-        </div>
-
-        {/* <div className="submission-history">
-          <h2>Submission History</h2>
-          <p className="history-description">
-            Track all your project submissions and their review status below.
-          </p>
-
-          <div className="submissions-list">
-            {mockSubmissions.length > 0 ? (
-              mockSubmissions.map((submission) => (
-                <div key={submission.id} className="submission-card">
-                  <div className="submission-info">
-                    <h3>{submission.title}</h3>
-                    <p>
-                      <strong>Submitted:</strong> {submission.submittedAt}
-                    </p>
-                    <p>
-                      <strong>Status:</strong>
-                      <span
-                        className="status-badge"
-                        style={{
-                          color: getStatusColor(submission.status),
-                          backgroundColor: `${getStatusColor(
-                            submission.status
-                          )}15`,
-                          padding: "4px 12px",
-                          borderRadius: "20px",
-                          marginLeft: "8px",
-                          fontWeight: "600",
-                        }}
-                      >
-                        {getStatusEmoji(submission.status)}{" "}
-                        {submission.status}
-                      </span>
-                    </p>
-
-                    {submission.feedback && (
-                      <div className="feedback">
-                        <h4>Reviewer Feedback</h4>
-                        <p>{submission.feedback}</p>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="submission-actions">
-                    <button
-                      className="download-btn"
-                      onClick={() =>
-                        alert("Download feature will be implemented soon!")
-                      }
-                    >
-                      Download
-                    </button>
-                    {submission.status === "Pending Review" && (
-                      <button
-                        className="edit-btn"
-                        onClick={() =>
-                          alert("Edit feature will be implemented soon!")
-                        }
-                      >
-                        ✏️ Edit
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="no-submissions">
-                <div className="no-submissions-icon">📭</div>
-                <h3>No Submissions Yet</h3>
-                <p>
-                  You haven't made any submissions yet. Click the button above
-                  to get started!
-                </p>
-              </div>
-            )}
-          </div>
-
-          {mockSubmissions.length > 0 && (
-            <div className="submission-stats">
-              <div className="stat-card">
-                <div className="stat-number">{mockSubmissions.length}</div>
-                <div className="stat-label">Total Submissions</div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-number">
-                  {mockSubmissions.filter((s) => s.status === "Approved")
-                    .length}
-                </div>
-                <div className="stat-label">Approved</div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-number">
-                  {
-                    mockSubmissions.filter(
-                      (s) => s.status === "Pending Review"
-                    ).length
-                  }
-                </div>
-                <div className="stat-label">Pending</div>
-              </div>
+          {statusMessage && (
+            <div
+              className="success-message"
+              style={{ borderLeftColor: "#0891b2" }}
+            >
+              {statusMessage}
             </div>
           )}
         </div>
 
-        <div className="submission-tips">
-          <h3>💡 Submission Tips</h3>
-          <div className="tips-grid">
-            <div className="tip-item">
-              <span className="tip-icon">📝</span>
-              <p>
-                <strong>Clear Documentation:</strong> Include comprehensive
-                project documentation with your submission.
-              </p>
+        <div style={{ width: "100%", maxWidth: 800, textAlign: "center" }}>
+          <button
+            className="download-btn"
+            onClick={checkAnalysis}
+            style={{ marginBottom: 16 }}
+          >
+            Check Analysis
+          </button>
+
+          {analysis ? (
+            <div className="member-list" style={{ textAlign: "left" }}>
+              <h4>Latest Analysis</h4>
+              <ul>
+                <li>Status: {analysis.analysisStatus}</li>
+                {analysis.analysisDate && (
+                  <li>
+                    Completed At:{" "}
+                    {new Date(analysis.analysisDate).toLocaleString()}
+                  </li>
+                )}
+                {analysis.analysisResults && (
+                  <>
+                    <li>
+                      Overall Score:{" "}
+                      {analysis.analysisResults.overall_score ?? "N/A"}
+                    </li>
+                    <li>
+                      Summary: {analysis.analysisResults.summary ?? "N/A"}
+                    </li>
+                  </>
+                )}
+              </ul>
             </div>
-            <div className="tip-item">
-              <span className="tip-icon">🎥</span>
-              <p>
-                <strong>Demo Video:</strong> Consider including a demo video to
-                showcase your project's functionality.
-              </p>
+          ) : (
+            <div className="member-list">
+              <h4>No analysis yet</h4>
             </div>
-            <div className="tip-item">
-              <span className="tip-icon">🔍</span>
-              <p>
-                <strong>Review Guidelines:</strong> Make sure your submission
-                meets all the competition requirements.
-              </p>
-            </div>
-            <div className="tip-item">
-              <span className="tip-icon">⏰</span>
-              <p>
-                <strong>Submit Early:</strong> Don't wait until the last minute
-                - submit early to avoid technical issues.
-              </p>
-              <div style={{ height: "64px" }} />
-            </div>
-          </div>
-        </div> */}
+          )}
+        </div>
+
+        <div className="page-bottom-spacer" />
       </div>
     </div>
   );

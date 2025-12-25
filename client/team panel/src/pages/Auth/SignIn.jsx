@@ -62,7 +62,7 @@ const SignIn = () => {
       // Update context and navigate
       setTeam(team);
       toast.success("Signed in successfully");
-      navigate("/");
+      navigate("/dashboard");
     } catch (err) {
       setError(err.message);
       toast.error(err.message);
@@ -73,9 +73,12 @@ const SignIn = () => {
 
   return (
     <>
-      <HeaderSignIn />
+      {/* <HeaderSignIn /> */}
       <div className="auth-container">
         <div className="auth-card">
+          <div className="auth-logo">
+            <img src="../../public/images/codoraai.png" alt="Codora AI" />
+          </div>
           <h2>Team Sign In</h2>
           {error && <div className="error-message">{error}</div>}
           <form onSubmit={handleSubmit}>
@@ -83,6 +86,7 @@ const SignIn = () => {
               <div className="form-group">
                 <label>Email ID</label>
                 <input
+                
                   type="email"
                   name="email"
                   value={formData.email}
@@ -109,6 +113,10 @@ const SignIn = () => {
             <button type="submit" className="auth-button" disabled={loading}>
               {loading ? "Signing In..." : "Sign In"}
             </button>
+            <p className="auth-link">
+              Don’t have a team? <a href="/signup">Register here</a>
+            </p>
+
 
             {/* <div className="demo-credentials">
               <h3>Demo Credentials</h3>

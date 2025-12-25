@@ -1,12 +1,11 @@
-.auth-background { 
-  position: fixed; 
-  inset: 0; 
-  background: linear-gradient(120deg, #f9fafb 60%, #80bdfd 100%); 
+.auth-background {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(120deg, #f9fafb 60%, #80bdfd 100%);
   display: flex;
-  align-items: center; 
-  justify-content: center; 
+  align-items: center;
+  justify-content: center;
 }
-
 
 .auth-container {
   width: 420px;
@@ -180,4 +179,30 @@ button.secondary:hover {
 .step-indicator span.active {
   background: #0077ff;
   transform: scale(1.2);
+}
+.success-box {
+  background: #e6fffa;
+  color: #065f46;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.auth-footer span {
+  color: #0077ff;
+  cursor: pointer;
+  font-weight: 600;
 }

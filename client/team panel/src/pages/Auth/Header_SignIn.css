@@ -75,6 +75,11 @@
     .header-logo {
         height: 32px;
     }
+
+    .dc-logo {
+        height: 34px; /* Increase the size of the DC logo */
+        width: auto;
+    }
     
     .header-right-logo {
         height: 28px;

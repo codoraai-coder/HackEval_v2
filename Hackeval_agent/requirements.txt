@@ -1,7 +1,7 @@
 python-dotenv
 langchain-core
 langchain-openai
-pydantic==1.10.13 
+pydantic>=2.0.0
 python-pptx
 pypdf
 Pillow
@@ -10,3 +10,6 @@ pypdfium2
 comtypes 
 pandas
 openpyxl
+fastapi
+uvicorn[standard]
+python-multipart

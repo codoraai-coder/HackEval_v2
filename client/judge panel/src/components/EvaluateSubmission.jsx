@@ -325,9 +325,9 @@ const EvaluateSubmission = () => {
                 <div className="detail-row">
                   <strong>Category:</strong> {selectedTeam.problemStatement?.category || 'Not specified'}
                 </div>
-                <div className="detail-row">
+                {/* <div className="detail-row">
                   <strong>Problem ID:</strong> {selectedTeam.problemStatement?.ps_id || 'Not specified'}
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
@@ -467,35 +467,45 @@ const EvaluateSubmission = () => {
             <p>Rate each parameter on a scale of 1-10</p>
           </div>
 
-          <div className="parameters-grid">
-            {Object.entries(EVALUATION_PARAMETERS).map(([key, param]) => (
-              <div key={key} className="parameter-item">
-                <div className="parameter-header">
-                  <label className="parameter-label">{param.label}</label>
-                  <div className="parameter-meta">
-                    <span className="parameter-weightage">{(param.weight * 100)}%</span>
-                    <span className={`parameter-score score-${getScoreColor(evaluation[key])}`}>
-                      {evaluation[key]}/10
-                    </span>
-                  </div>
-                </div>
-                <div className="slider-container">
-                  <input
-                    type="range"
-                    min="1"
-                    max="10"
-                    value={evaluation[key]}
-                    onChange={(e) => handleSliderChange(key, e.target.value)}
-                    className="slider"
-                  />
-                  <div className="slider-labels">
-                    <span>Poor</span>
-                    <span>Excellent</span>
-                  </div>
+
+          
+        <div className="parameters-grid">
+          {Object.entries(EVALUATION_PARAMETERS).map(([key, param]) => (
+            <div key={key} className="parameter-item">
+              <div className="parameter-header">
+                <label className="parameter-label">{param.label}</label>
+                <div className="parameter-meta">
+                  <span className="parameter-weightage">{(param.weight * 100)}%</span>
+                  <span className={`parameter-score score-${getScoreColor(evaluation[key])}`}>
+                    {evaluation[key]}/10
+                  </span>
                 </div>
               </div>
-            ))}
-          </div>
+              
+              {/* NEW NUMBER INPUT SYSTEM */}
+              <div className="number-input-container">
+                <div className="number-buttons">
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+                    <button
+                      key={num}
+                      type="button"
+                      className={`number-btn ${evaluation[key] === num ? 'active' : ''} ${
+                        num >= 8 ? 'high' : num >= 6 ? 'medium' : 'low'
+                      }`}
+                      onClick={() => handleSliderChange(key, num)}
+                    >
+                      {num}
+                    </button>
+                  ))}
+                </div>
+                <div className="score-labels">
+                  <span className="label-poor">Poor</span>
+                  <span className="label-excellent">Excellent</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
 
           <div className="form-section">
             <label className="form-label">Personalized Feedback</label>

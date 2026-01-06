@@ -22,6 +22,7 @@ import ProfileSettings from "./pages/Auth/ProfileSettings.jsx";
 
 import SignIn from "./pages/Auth/SignIn.jsx";
 import SignUp from "./pages/Auth/Signup.jsx";
+import ProgramSchedule from "./pages/ProgramSchedule.jsx";
 
 import { TeamProvider } from "./context/TeamContext.jsx";
 import "./pages/styles.css";
@@ -56,6 +57,14 @@ function AppLayout() {
             element={
               <PrivateRoute>
                 <TeamInfo />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/program-schedule"
+            element={
+              <PrivateRoute>
+                <ProgramSchedule />
               </PrivateRoute>
             }
           />

@@ -251,7 +251,7 @@ const Dashboard = () => {
         {/* Teams List */}
         <div className="dashboard-section">
           <div className="section-header">
-            <h2>All Teams</h2>
+            <h2>Assigned Teams</h2>
             <div className="section-actions">
               <div className="search-filter-container">
                 {/* Search Bar */}
@@ -317,7 +317,7 @@ const Dashboard = () => {
                   <div key={team._id} className="team-item">
                     <div className="team-info">
                       <h4>{team.teamName}</h4>
-                      <p className="team-category">Category: {team.category || 'N/A'}</p>
+                      {/* <p className="team-category">Category: {team.category || 'N/A'}</p> */}
                       <p className="team-project">Project: {team.projectTitle || 'Not specified'}</p>
                       <p className="team-members-count">
                         Members: {team.members ? team.members.length : 0}

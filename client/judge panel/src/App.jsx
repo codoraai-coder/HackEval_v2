@@ -11,6 +11,8 @@ import SignUp from "./components/Signup.jsx"; // Import the SignUp component
 import Assign from "./components/Assign.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import "./App.css";
+import Leaderboard from "./components/Leaderboard.jsx";
+import JudgeSchedule from "./components/JudgeSchedule.jsx";
 
 // Layout to hide sidebar/footer on SignIn and SignUp pages
 function Layout({ children }) {
@@ -24,7 +26,7 @@ function Layout({ children }) {
         {children}
         {!isAuthPage && (
           <footer className="footer">
-            © {new Date().getFullYear()} GLA University | Judge Evaluation Portal
+            © {new Date().getFullYear()} Codora AI | Judge Evaluation Portal
           </footer>
         )}
       </main>
@@ -48,6 +50,17 @@ function App() {
           <Route path="/dashboard" element={
             <ProtectedRoute>
               <Dashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/leaderboard" element={
+            <ProtectedRoute>
+              <Leaderboard />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/judge-schedule" element={ // Add this route
+            <ProtectedRoute>
+              <JudgeSchedule />
             </ProtectedRoute>
           } />
           <Route path="/evaluate" element={

@@ -9,7 +9,8 @@ import {
   UserPlus,
   Trophy,
   X, // Import close icon
-  LogOut // Import logout icon
+  LogOut, // Import logout icon
+  Calendar
 } from 'lucide-react';
 import './Sidebar.css';
 
@@ -31,6 +32,11 @@ const Sidebar = ({ isOpen, onClose }) => {
     //   icon: <UserPlus size={20} />,
     //   label: 'Assign'
     // },
+   {
+      path: '/judge-schedule', // Add this new route
+      icon: <Calendar size={20} />, // Calendar icon for schedule
+      label: 'Judge Schedule'
+    },
     {
       path: '/my-evaluations',
       icon: <ClipboardList size={20} />,

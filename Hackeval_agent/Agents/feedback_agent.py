@@ -1,6 +1,6 @@
 import os
 import asyncio
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 
 from pydantic import BaseModel, field_validator
 from openai import OpenAI
@@ -89,7 +89,7 @@ Deck text excerpt:
         raise last_err or RuntimeError("feedback llm failed")
 
     @staticmethod
-    def _extract_first_json(text: str) -> str | None:
+    def _extract_first_json(text: str) -> Optional[str]:
         if "```json" in text:
             try:
                 return text.split("```json", 1)[1].split("```", 1)[0].strip()

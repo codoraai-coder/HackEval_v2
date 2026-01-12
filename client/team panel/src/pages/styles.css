@@ -1,6 +1,6 @@
 /* Common styles */
-.dashboard-container,
-.team-info-container,
+/* .dashboard-container, */
+/* .team-info-container, */
 .submissions-container,
 .leaderboard-container,
 .mentors-container,
@@ -752,67 +752,6 @@
 }
 
 /* Team members styles */
-.team-members {
-    background: var(--white);
-    padding: 1rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.team-members h2 {
-    color: var(--primary-green);
-    margin-bottom: 0.5rem;
-    font-size: 1.2rem;
-    flex-shrink: 0;
-}
-
-.members-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-}
-
-.member-card {
-    background: var(--light-gray);
-    padding: 1rem;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    transition: transform 0.2s ease;
-}
-
-.member-card:hover {
-    transform: translateY(-2px);
-}
-
-.member-avatar {
-    width: 50px;
-    height: 50px;
-    background: var(--primary-green);
-    color: var(--white);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    font-size: 1.2rem;
-}
-
-.member-info h4 {
-    color: var(--primary-green);
-    margin-bottom: 0.25rem;
-    font-size: 0.9rem;
-}
-
-.member-info p {
-    color: var(--gray);
-    font-size: 0.8rem;
-    margin: 0;
-}
 
 /* Profile link styles */
 .profile-link {

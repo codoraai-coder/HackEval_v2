@@ -9,7 +9,7 @@ const getAuthToken = () => {
 export const getJudgeProfile = async () => {
   try {
     const token = getAuthToken();
-    const response = await fetch(`${API_BASE_URL}/judge/evaluation/current`, {
+    const response = await fetch(`${API_BASE_URL}/judge/current`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

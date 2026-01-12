@@ -170,6 +170,7 @@
 .nav-tab.active {
   color: #3b82f6;
   border-bottom-color: #3b82f6;
+  border-radius: 4px;
   background-color: #f8fafc;
 }
 

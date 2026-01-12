@@ -12,29 +12,43 @@ const Leaderboard = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchLeaderboard = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await fetch(`${API_BASE_URL}/leaderboard/ppt`);
-        if (!response.ok) throw new Error(`Failed to fetch leaderboard: ${response.status}`);
-        const data = await response.json();
+  const fetchLeaderboard = async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-        const sorted = [...data].sort((a, b) => {
-          const ra = Number.parseInt(a?.rank, 10);
-          const rb = Number.parseInt(b?.rank, 10);
-          return (Number.isFinite(ra) ? ra : Number.POSITIVE_INFINITY) - (Number.isFinite(rb) ? rb : Number.POSITIVE_INFINITY);
-        });
-
-        setLeaderboardData(sorted);
-      } catch (err) {
-        setError(err.message || "Failed to load leaderboard data");
-      } finally {
-        setLoading(false);
+      const response = await fetch(`${API_BASE_URL}/leaderboard/ppt`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch leaderboard: ${response.status}`);
       }
-    };
-    fetchLeaderboard();
-  }, []);
+
+      // ✅ DEFINE result properly
+      const result = await response.json();
+      console.log("Leaderboard API response:", result);
+
+      // ✅ Always extract array safely
+      const rows = Array.isArray(result.data) ? result.data : [];
+
+      // ✅ Sort by rank (pending → bottom)
+      const sorted = [...rows].sort((a, b) => {
+        const ra = Number.parseInt(a?.rank, 10);
+        const rb = Number.parseInt(b?.rank, 10);
+        return (Number.isFinite(ra) ? ra : Number.POSITIVE_INFINITY) -
+               (Number.isFinite(rb) ? rb : Number.POSITIVE_INFINITY);
+      });
+
+      setLeaderboardData(sorted);
+    } catch (err) {
+      console.error(err);
+      setError(err.message || "Failed to load leaderboard data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchLeaderboard();
+}, []);
+
 
   const isCurrentTeam = (teamName) =>
     team && (team.teamName === teamName || team.teamId === teamName);

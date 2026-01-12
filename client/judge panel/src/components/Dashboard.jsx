@@ -26,6 +26,8 @@ const Dashboard = () => {
   const [evaluatedCount, setEvaluatedCount] = useState(0);
   const [pendingCount, setPendingCount] = useState(0);
   const [statsLoading, setStatsLoading] = useState(false);
+  const [judgeId, setJudgeId] = useState(null);
+
   
   // Filtering and pagination states
   const [searchTerm, setSearchTerm] = useState('');
@@ -49,13 +51,14 @@ const Dashboard = () => {
           return;
         }
         
-        const response = await fetch(`${API_BASE_URL}/judge/evaluation/current`, {
+        const response = await fetch(`${API_BASE_URL}/judge/current`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           }
         });
+        // console.log(response);
         
         if (response.ok) {
           const data = await response.json();
@@ -88,8 +91,11 @@ const Dashboard = () => {
           }
         });
         
+        
+        
         if (response.ok) {
           const data = await response.json();
+          console.log(data);
           setTeams(data.data || []);
         } else {
           console.error('Failed to fetch teams');
@@ -147,6 +153,21 @@ const Dashboard = () => {
                            team.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  // const filteredTeams = teams
+  // // 🔒 SHOW ONLY TEAMS ASSIGNED TO CURRENT JUDGE
+  // .filter(team => team.assignedJudgeId === judgeId)
+  // .filter(team => {
+  //   const matchesSearch =
+  //     team.teamName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //     team.projectTitle?.toLowerCase().includes(searchTerm.toLowerCase());
+
+  //   const matchesCategory =
+  //     selectedCategory === 'all' || team.category === selectedCategory;
+
+  //   return matchesSearch && matchesCategory;
+  // });
+
 
   // Get unique categories for filter dropdown
   const categories = ['all', ...Array.from(new Set(teams.map(team => team.category).filter(Boolean)))];

@@ -80,30 +80,28 @@ const EvaluateSubmission = () => {
   };
 
   const loadPptEvaluation = async (teamName) => {
-    if (!teamName) return;
-    
-    console.log('Loading PPT evaluation for team:', teamName);
-    setLoadingPptData(true);
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/team-evaluation/${encodeURIComponent(teamName)}`);
+  if (!teamName) return;
 
-      console.log('PPT API Response status:', response.status);
-      
-      if (response.ok) {
-        const result = await response.json();
-        console.log('PPT API Response data:', result);
-        setPptEvaluation(result.data);
-      } else {
-        console.log('No PPT evaluation data found for team:', teamName);
-        const errorText = await response.text();
-        console.log('Error response:', errorText);
-      }
-    } catch (error) {
-      console.error('Error loading PPT evaluation data:', error);
-    } finally {
-      setLoadingPptData(false);
+  setLoadingPptData(true);
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/team/ppt/team-evaluation/${encodeURIComponent(teamName)}`
+    );
+
+    if (response.ok) {
+      const result = await response.json();
+      setPptEvaluation(result.data);
+    } else {
+      setPptEvaluation(null);
     }
-  };
+  } catch (error) {
+    console.error("Error loading PPT AI evaluation:", error);
+    setPptEvaluation(null);
+  } finally {
+    setLoadingPptData(false);
+  }
+};
+
 
   // If no team is selected, show selection message
   if (!selectedTeam) {

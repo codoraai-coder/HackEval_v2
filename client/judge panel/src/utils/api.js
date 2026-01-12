@@ -124,9 +124,10 @@ export const getEvaluations = async (roundId = null, teamId = null) => {
 
 // Get judge's own evaluations (CORRECTED URL based on your app.js route)
 export const getMyEvaluations = async () => {
-  const url = `${AAPI_BASE_URL}/judge/team-evaluation/my-evaluations`;
+  const url = `${AAPI_BASE_URL}/judge/team-evaluation`;
   const response = await fetch(url, { headers: getAuthHeaders() });
   const parsed = await safeJsonParse(response, url);
+  console.log(response);
   if (!Array.isArray(parsed.data)) {
     throw new Error("Malformed API response: expected data array");
   }

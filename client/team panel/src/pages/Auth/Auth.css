@@ -28,7 +28,7 @@
 
 .auth-card {
   width: 100%;
-  max-width: 720px; /* Wider for SignUp */
+  max-width: 480px; /* Wider for SignUp */
   background: #ffffff;
   border-radius: 18px;
   padding: 35px 40px;

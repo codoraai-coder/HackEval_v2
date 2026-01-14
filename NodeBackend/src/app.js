@@ -12,6 +12,7 @@ import adminEvaluation from "./routes/admin/evaluation.route.js";
 import teamEvaluation from "./routes/judge/teamEvaluation.route.js";
 import mentorRouter from "./routes/admin/mentor.route.js";
 import pptSubmissionRouter from "./routes/team/pptSubmission.route.js";
+import pptLeaderboardRouter from "./routes/leaderboard/pptLeaderboard.route.js";
 import leaderboardRouter from "./routes/leaderboard.route.js";
 import roundStateRouter from "./routes/roundState.route.js";
 import uploadRouter from "./routes/admin/upload.route.js";

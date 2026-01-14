@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { TeamContext } from "../../context/TeamContext";
+import { TeamContext } from "../../context/TeamContext.jsx";
 import toast from "react-hot-toast";
 import "./Auth.css";
 import { API_BASE_URL } from "../../config";

@@ -1,27 +1,39 @@
 import { v2 as cloudinary } from "cloudinary";
-import fs from "fs"; // file system (by default in node it is use to manage files)
+import fs from "fs";
 
-// Configuration
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET, // Click 'View API Keys' above to copy your API secret
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
 const uploadOnCoudinary = async (localFilePath) => {
   try {
     if (!localFilePath) return null;
-    // upload the file on cloudinary
     const response = await cloudinary.uploader.upload(localFilePath, {
       resource_type: "auto",
     });
-    // file has been uploaded successfully
-    console.log("File is uploaded on cloudinary", response.url);
+    console.log("File uploaded to Cloudinary:", response.secure_url);
     return response;
   } catch (error) {
-    fs.unlinkSync(localFilePath); // remove the locally saved temporary file as the upload operation got failed
+    try {
+      fs.unlinkSync(localFilePath);
+    } catch {}
     return null;
   }
 };
 
-export { uploadOnCoudinary };
+const deleteFromCloudinary = async (publicId) => {
+  try {
+    if (!publicId) return null;
+    const res = await cloudinary.uploader.destroy(publicId, {
+      resource_type: "auto",
+    });
+    return res;
+  } catch (e) {
+    console.error("Cloudinary delete error:", e.message);
+    return null;
+  }
+};
+
+export { uploadOnCoudinary, deleteFromCloudinary };

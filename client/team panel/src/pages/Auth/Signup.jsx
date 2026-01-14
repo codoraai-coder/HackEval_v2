@@ -175,9 +175,12 @@ const SignUp = () => {
 
   return (
     <>
-      <HeaderSignIn />
+      {/* <HeaderSignIn /> */}
       <div className="auth-container">
         <div className="auth-card wide">
+          <div className="auth-logo">
+            <img src="../../public/images/codoraai.png" alt="Codora AI" />
+          </div>
           <h2>Team Registration</h2>
           {error && <div className="error-message">{error}</div>}
           <form onSubmit={handleSubmit}>

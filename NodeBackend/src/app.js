@@ -47,6 +47,8 @@ app.use("/team", teamRouter);
 app.use("/judge/team-evaluation", teamEvaluation);
 app.use("/mentor", mentorRouter);
 app.use("/team/ppt", pptSubmissionRouter); // Add PPT submission routes
+app.use("/leaderboard", pptLeaderboardRouter);
+
 app.use("/leaderboard", leaderboardRouter);
 app.use("/round-state", roundStateRouter);
 app.use("/admin/upload", uploadRouter);

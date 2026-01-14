@@ -3,13 +3,16 @@ import { Navigate } from "react-router-dom";
 import { TeamContext } from "../context/TeamContext.jsx";
 
 const PrivateRoute = ({ children }) => {
-  const { team } = useContext(TeamContext);
-  const { loading } = useContext(TeamContext);
+  const { team, loading } = useContext(TeamContext);
+
+  // IMPORTANT: wait for loading to finish
+  if (loading) {
+    return <div style={{ padding: 24 }}>Loading...</div>;
+  }
 
   if (!team) {
     return <Navigate to="/signin" replace />;
   }
-  if (loading) return <div style={{ padding: 24 }}>Loading...</div>;
 
   return children;
 };

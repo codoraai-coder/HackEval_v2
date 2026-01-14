@@ -169,14 +169,22 @@ import {
   uploadOnCoudinary,
   deleteFromCloudinary,
 } from "../../utils/cloudnary.js";
+import FormData from "form-data";
 
 // External evaluator config
-const EXTERNAL_API_URL =
-  process.env.PPT_EVAL_URL || "https://pptEvaluation.com/api/submit";
+const EXTERNAL_API_URL = process.env.PPT_EVAL_URL;
 const WEBHOOK_SECRET = process.env.PPT_WEBHOOK_SECRET || "super-secret";
 const WEBHOOK_CALLBACK_URL =
   process.env.PPT_WEBHOOK_URL ||
   "https://yourdomain.com/team-ppt/webhook/evaluation-result";
+
+/**
+ * Submit PPT/PDF for evaluation:
+ * - upload to Cloudinary
+ * - stream Cloudinary file to external evaluator as multipart/form-data with key 'file'
+ * - save evaluator response into team.pptSubmission.analysisResults
+ * - update status/date, cleanup local file and cloudinary asset on success
+ */
 
 // In-memory job queue
 const pendingJobs = new Map(); // key: teamId, value: { cloudinaryPublicId, startedAt }
@@ -189,10 +197,18 @@ const enqueueJob = (job) => {
   setImmediate(processQueue);
 };
 const processQueue = async () => {
-  if (activeWorkers >= MAX_CONCURRENCY) return;
+  if (activeWorkers >= MAX_CONCURRENCY) {
+    console.log(
+      `[PPT-QUEUE] Max concurrency reached (${activeWorkers}/${MAX_CONCURRENCY}), deferring`,
+    );
+    return;
+  }
   const job = dispatchQueue.shift();
   if (!job) return;
-  activeWorkers++;
+  activeWorkers;
+  console.log(
+    `[PPT-QUEUE] Starting job for team ${job.teamId}. activeWorkers=${activeWorkers}`,
+  );
   try {
     await job.run();
   } catch (e) {
@@ -200,8 +216,12 @@ const processQueue = async () => {
     job.retries = (job.retries || 0) + 1;
     if (job.retries <= 5) {
       const delay = Math.min(60000, 2000 * Math.pow(2, job.retries));
+      console.log(
+        `[PPT-QUEUE] Scheduling retry #${job.retries} for team ${job.teamId} in ${delay}ms`,
+      );
       setTimeout(() => enqueueJob(job), delay);
     } else {
+      console.log(`[PPT-QUEUE] Max retries exceeded for team ${job.teamId}`);
       job.onFail && job.onFail(e);
     }
   } finally {
@@ -214,6 +234,9 @@ const processQueue = async () => {
 const submitPPT = asyncHandler(async (req, res) => {
   const { teamId } = req.params;
   const leaderEmailFromBody = req.body.leaderEmail;
+  console.log(
+    `[PPT] Received submit request for teamId=${teamId}, file=${req.file?.originalname}`,
+  );
 
   if (!req.file) throw new ApiError(400, "PPT/PDF file is required");
 
@@ -222,10 +245,14 @@ const submitPPT = asyncHandler(async (req, res) => {
 
   // Upload to Cloudinary
   const cloudRes = await uploadOnCoudinary(req.file.path);
-  try {
-    fs.unlinkSync(req.file.path);
-  } catch {}
-  if (!cloudRes) throw new ApiError(500, "Failed to upload file to Cloudinary");
+  console.log("[PPT] Cloudinary upload result:", cloudRes || "null");
+  if (!cloudRes) {
+    // cleanup local file if upload failed
+    try {
+      fs.unlinkSync(req.file.path);
+    } catch (e) {}
+    throw new ApiError(500, "Failed to upload file to Cloudinary");
+  }
 
   // Save submission info on team
   const leaderEmail =
@@ -245,45 +272,145 @@ const submitPPT = asyncHandler(async (req, res) => {
     analysisResults: undefined,
   };
   await team.save();
+  console.log(
+    `[PPT] Saved pptSubmission for team ${teamId}. leader=${leaderEmail}`,
+  );
 
-  // Prepare dispatch job to external API
-  const job = {
-    teamId: team._id.toString(),
-    retries: 0,
-    run: async () => {
-      const payload = {
-        fileUrl: cloudRes.secure_url,
-        leaderEmail,
-        callbackUrl: WEBHOOK_CALLBACK_URL,
-        signature: WEBHOOK_SECRET,
-      };
-      await axios.post(EXTERNAL_API_URL, payload, { timeout: 30000 });
-      pendingJobs.set(team._id.toString(), {
-        cloudinaryPublicId: cloudRes.public_id,
-        startedAt: Date.now(),
-      });
-    },
-    onFail: async (err) => {
+  try {
+    // Get file stream from Cloudinary URL
+    console.log(
+      `[PPT] Downloading file from Cloudinary URL for team ${teamId}`,
+    );
+    const fileResp = await axios.get(cloudRes.secure_url, {
+      responseType: "stream",
+      timeout: 120000, // 2 minutes to download from cloudinary
+    });
+    console.log(`[PPT] Downloaded stream from Cloudinary for team ${teamId}`);
+
+    // Prepare multipart/form-data for external evaluator
+    const form = new FormData();
+    // Append stream as field 'file' (external API expects 'file' multipart)
+    form.append("file", fileResp.data, {
+      filename: req.file.originalname,
+      contentType: req.file.mimetype,
+    });
+
+    // If your external evaluator supports agent_mode or other fields, append them:
+    // form.append('agent_mode', 'default');
+
+    const axiosConfig = {
+      headers: {
+        ...form.getHeaders(),
+      },
+      timeout: 300000, // 5 minutes for evaluation
+    };
+
+    // POST to external evaluator
+    console.log(
+      `[PPT] Sending file to external evaluator for team ${teamId} -> ${EXTERNAL_API_URL}`,
+    );
+    const evalRes = await axios.post(EXTERNAL_API_URL, form, axiosConfig);
+    console.log(
+      `[PPT] External evaluator responded for team ${teamId} with status ${evalRes.status}`,
+    );
+    const analysisRaw = evalRes?.data ?? {};
+    console.log(`[PPT] Raw analysis for team ${teamId}:`, analysisRaw);
+    // Normalize / map external API response into your schema shape
+    const mapped = {
+      // prefer explicit keys used in your schema; fall back to external names
+      overall_score:
+        analysisRaw.total_score ??
+        analysisRaw.score ??
+        analysisRaw.overall_score ??
+        null,
+      // use external scores_breakdown or fallback
+      scores:
+        analysisRaw.scores_breakdown ??
+        analysisRaw.evaluation_scores ??
+        analysisRaw.scores ??
+        null,
+      feedback: analysisRaw.feedback ?? null,
+      summary: analysisRaw.message ?? analysisRaw.summary ?? null,
+      // keep raw response for future debugging
+      raw: analysisRaw,
+    };
+
+    // Persist analysis results
+    team.pptSubmission.analysisResults = mapped;
+    team.pptSubmission.analysisStatus = "completed";
+    team.pptSubmission.analysisDate = new Date();
+    team.pptSubmission.analysisError = undefined;
+    await team.save();
+    console.log(`[PPT] Persisted analysis results for team ${teamId}`);
+
+    // Cleanup local uploaded file
+    try {
+      fs.unlinkSync(req.file.path);
+    } catch (cleanupErr) {
+      console.error("Local file cleanup failed:", cleanupErr.message);
+    }
+
+    // Optionally delete Cloudinary asset to free storage after successful evaluation
+    try {
+      await deleteFromCloudinary(cloudRes.public_id);
+    } catch (delErr) {
+      console.warn("Failed to delete cloudinary asset:", delErr.message);
+      // Not fatal; we still return success
+    }
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          { team, analysis: mapped },
+          "PPT evaluated and saved",
+        ),
+      );
+  } catch (error) {
+    console.error("Evaluation error:", error.message || error);
+
+    // Mark as failed and persist error details; keep Cloudinary asset for retries
+    try {
       const t = await Team.findById(team._id);
       if (t) {
         t.pptSubmission.analysisStatus = "failed";
-        t.pptSubmission.analysisError = `Submit failed: ${err.message}`;
+        // Prefer specific external error message if available
+        const errMsg =
+          error?.response?.data?.message ||
+          (error?.response?.data
+            ? JSON.stringify(error.response.data)
+            : undefined) ||
+          error.message ||
+          "Evaluation failed";
+        t.pptSubmission.analysisError = `Evaluation failed: ${errMsg}`;
         await t.save();
       }
-    },
-  };
-  enqueueJob(job);
+    } catch (saveErr) {
+      console.error("Failed to update team after eval error:", saveErr.message);
+    }
 
-  return res
-    .status(200)
-    .json(
-      new ApiResponse(
-        200,
-        { team },
-        "PPT/PDF uploaded and queued for evaluation",
-      ),
+    // Cleanup local file anyway
+    try {
+      fs.unlinkSync(req.file.path);
+    } catch (cleanupErr) {}
+
+    // Do not delete cloudinary asset here; leaving it allows retries (resend sweep or manual)
+    throw new ApiError(
+      500,
+      `PPT analysis failed: ${error?.message || "Unknown error"}`,
     );
+  }
 });
+
+/*
+- This implementation downloads the file from Cloudinary and streams it to the evaluator. That avoids keeping large local files around but still uses Cloudinary as the canonical stored copy.
+- If the evaluator accepts a file URL instead of a binary upload, you could instead send cloudRes.secure_url directly to the evaluator; but the API spec you gave expects multipart file ("file"), so streaming is used here.
+- The mapping (mapped object) tries to populate overall_score, scores, feedback and summary fields expected by your schema. Adjust mapping if the external API uses different names or nested structures.
+- Timeouts: downloading file (120s) and evaluation (300s) are set conservatively; adjust to your needs.
+- On failure the Cloudinary asset is left intact to allow retry/resend. On success we attempt to delete it (to save storage), but delete failure is non-fatal.
+- Make sure uploadOnCoudinary returns secure_url and public_id
+*/
 
 // Get PPT analysis for a team
 const getPPTAnalysis = asyncHandler(async (req, res) => {

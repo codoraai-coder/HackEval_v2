@@ -38,12 +38,12 @@ const Submissions = () => {
       fd.append("leaderEmail", leaderEmail);
 
       const res = await fetch(
-        `${API_BASE_URL}/team/team-ppt/${team._id}/submit-ppt`,
+        `${API_BASE_URL}/team/ppt/${team._id}/submit-ppt`,
         {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
           body: fd,
-        }
+        },
       );
 
       const payload = await res.json();
@@ -66,8 +66,8 @@ const Submissions = () => {
       const team = JSON.parse(localStorage.getItem("team") || "{}");
 
       const res = await fetch(
-        `${API_BASE_URL}/team/team-ppt/${team._id}/ppt-analysis`,
-        { headers: { Authorization: `Bearer ${token}` } }
+        `${API_BASE_URL}/team/ppt/${team._id}/ppt-analysis`,
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
       const payload = await res.json();
@@ -107,35 +107,34 @@ const Submissions = () => {
           </div>
         </div>
 
-      <p className="submission-desc">
-  Upload your project PPT or PDF. Our system will analyze it and generate
-  evaluation insights.
-</p>
+        <p className="submission-desc">
+          Upload your project PPT or PDF. Our system will analyze it and
+          generate evaluation insights.
+        </p>
 
-<div className="submission-upload-row">
-  <label className="file-input-box">
-    <input
-      type="file"
-      accept=".ppt,.pptx,.pdf"
-      onChange={handleFileChange}
-      disabled={isLoading}
-      hidden
-    />
-    {selectedFile ? selectedFile.name : "📁 Choose File"}
-  </label>
+        <div className="submission-upload-row">
+          <label className="file-input-box">
+            <input
+              type="file"
+              accept=".ppt,.pptx,.pdf"
+              onChange={handleFileChange}
+              disabled={isLoading}
+              hidden
+            />
+            {selectedFile ? selectedFile.name : "📁 Choose File"}
+          </label>
 
-  <button
-    className="submission-btn"
-    onClick={submitFile}
-    disabled={isLoading || !selectedFile}
-  >
-    🚀 Upload & Analyze
-  </button>
-</div>
-{statusMessage && (
-  <div className="submission-error">{statusMessage}</div>
-)}
-
+          <button
+            className="submission-btn"
+            onClick={submitFile}
+            disabled={isLoading || !selectedFile}
+          >
+            🚀 Upload & Analyze
+          </button>
+        </div>
+        {statusMessage && (
+          <div className="submission-error">{statusMessage}</div>
+        )}
       </div>
 
       {/* Analysis Section */}
@@ -143,9 +142,7 @@ const Submissions = () => {
         <div className="team-schedule-section-header team-schedule-gradient">
           <div className="team-schedule-section-title">
             <span className="team-schedule-section-number">02</span>
-            <span className="team-schedule-section-text">
-              ANALYSIS RESULT
-            </span>
+            <span className="team-schedule-section-text">ANALYSIS RESULT</span>
           </div>
         </div>
 

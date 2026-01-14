@@ -32,7 +32,7 @@ export const getJudgeProfile = async () => {
 export const getAllTeams = async () => {
   try {
     const token = getAuthToken();
-    const response = await fetch(`${API_BASE_URL}/judge/team-evaluation/teams`, {
+    const response = await fetch(`${API_BASE_URL}/judge/evaluation/teams`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

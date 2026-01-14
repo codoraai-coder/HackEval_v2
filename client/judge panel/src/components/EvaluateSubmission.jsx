@@ -265,7 +265,6 @@ const EvaluateSubmission = () => {
           <div className="metadata-header">
             <div className="team-info">
               <h2>{selectedTeam.teamName}</h2>
-              <p className="team-id">ID: {selectedTeam._id}</p>
               <span className="category-badge">{selectedTeam.problemStatement?.category || 'General'}</span>
             </div>
             <div className="submission-meta">
@@ -323,9 +322,6 @@ const EvaluateSubmission = () => {
                 <div className="detail-row">
                   <strong>Category:</strong> {selectedTeam.problemStatement?.category || 'Not specified'}
                 </div>
-                {/* <div className="detail-row">
-                  <strong>Problem ID:</strong> {selectedTeam.problemStatement?.ps_id || 'Not specified'}
-                </div> */}
               </div>
             </div>
           </div>

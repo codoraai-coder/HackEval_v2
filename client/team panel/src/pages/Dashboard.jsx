@@ -147,8 +147,8 @@ const Dashboard = () => {
   if (loading) {
     return (
       <div className="dashboard-page">
-        <div className="loading-container">
-          <div className="loading-spinner"></div>
+        <div className="dashboard-loading">
+          <div className="dashboard-spinner"></div>
           <h2>Loading Dashboard...</h2>
           <p>Please wait while we fetch your team information</p>
         </div>
@@ -167,11 +167,11 @@ const Dashboard = () => {
   if (error) {
     return (
       <Shell>
-        <div className="error-container">
-          <div className="error-icon">⚠️</div>
+        <div className="dashboard-error">
+          <div className="dashboard-error-icon">⚠️</div>
           <h1>Oops! Something went wrong</h1>
-          <p className="error-message">{error}</p>
-          <Link to="/signin" className="retry-button">
+          <p className="dashboard-error-message">{error}</p>
+          <Link to="/signin" className="dashboard-retry-btn">
             Return to Sign In
           </Link>
         </div>
@@ -182,15 +182,15 @@ const Dashboard = () => {
   if (!dashboardData) {
     return (
       <Shell>
-        <div className="empty-state">
-          <div className="empty-icon">👥</div>
+        <div className="dashboard-empty">
+          <div className="dashboard-empty-icon">👥</div>
           <h1>No Team Found</h1>
           <p>You haven't joined or created a team yet.</p>
-          <Link to="/team/join" className="cta-button">
+          <Link to="/team/join" className="dashboard-cta-btn">
             Join a Team
           </Link>
-          <p className="empty-subtext">or</p>
-          <Link to="/team/create" className="cta-button secondary">
+          <p className="dashboard-empty-subtext">or</p>
+          <Link to="/team/create" className="dashboard-cta-btn secondary">
             Create New Team
           </Link>
         </div>
@@ -202,51 +202,47 @@ const Dashboard = () => {
     <Shell>
       {/* Header Section */}
       <div className="dashboard-header">
-        <div className="header-left">
-          <h1>Team Dashboard</h1>
-          <div className="team-status-badge">
-            <span className="status-dot"></span>
-            {stats.projectStatus}
-          </div>
+        <div className="dashboard-title">
+          Team Dashboard
+          <span className="dashboard-title-highlight"></span>
         </div>
-        <div className="header-right">
-          <div className="current-round-card">
-            <span className="round-label">CURRENT ROUND</span>
-            <span className="round-value">
-              {activeRound ? `Round ${activeRound}` : "Not Started"}
-            </span>
-          </div>
+        <div className="dashboard-round-card">
+          <span className="dashboard-round-label">CURRENT ROUND</span>
+          <span className="dashboard-round-value">
+            {activeRound ? `Round ${activeRound}` : "Not Started"}
+          </span>
         </div>
       </div>
 
+
       {/* Stats Overview */}
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-icon">👥</div>
-          <div className="stat-content">
+      <div className="dashboard-stats-grid">
+        <div className="dashboard-stat-card">
+          <div className="dashboard-stat-icon">👥</div>
+          <div className="dashboard-stat-content">
             <h3>Team Size</h3>
-            <p className="stat-value">{stats.totalMembers} Members</p>
+            <p className="dashboard-stat-value">{stats.totalMembers} Members</p>
           </div>
         </div>
-        <div className="stat-card">
-          <div className="stat-icon">📋</div>
-          <div className="stat-content">
+        <div className="dashboard-stat-card">
+          <div className="dashboard-stat-icon">📋</div>
+          <div className="dashboard-stat-content">
             <h3>Problem Statement</h3>
-            <p className="stat-value">{dashboardData.problem_statement_id || "N/A"}</p>
+            <p className="dashboard-stat-value">{dashboardData.problem_statement_id || "N/A"}</p>
           </div>
         </div>
-        <div className="stat-card">
-          <div className="stat-icon">🎯</div>
-          <div className="stat-content">
+        <div className="dashboard-stat-card">
+          <div className="dashboard-stat-icon">🎯</div>
+          <div className="dashboard-stat-content">
             <h3>Category</h3>
-            <p className="stat-value">{dashboardData.category}</p>
+            <p className="dashboard-stat-value">{dashboardData.category}</p>
           </div>
         </div>
-        <div className="stat-card">
-          <div className="stat-icon">⏰</div>
-          <div className="stat-content">
+        <div className="dashboard-stat-card">
+          <div className="dashboard-stat-icon">⏰</div>
+          <div className="dashboard-stat-content">
             <h3>Next Deadline</h3>
-            <p className="stat-value">{stats.nextDeadline}</p>
+            <p className="dashboard-stat-value">{stats.nextDeadline}</p>
           </div>
         </div>
       </div>
@@ -254,56 +250,56 @@ const Dashboard = () => {
       {/* Main Content Grid */}
       <div className="dashboard-main-grid">
         {/* Team Details Section */}
-        <div className="dashboard-card team-details">
-          <div className="card-header">
+        <div className="dashboard-card dashboard-team-details">
+          <div className="dashboard-card-header">
             <h2>Team Details</h2>
-            <span className="team-id">ID: {dashboardData.team_id}</span>
+            <span className="dashboard-team-id">ID: {dashboardData.team_id}</span>
           </div>
           
-          <div className="team-info-grid">
-            <div className="info-item">
+          <div className="dashboard-team-info-grid">
+            <div className="dashboard-info-item">
               <label>Team Name</label>
-              <p className="info-value">{dashboardData.team_name}</p>
+              <p className="dashboard-info-value">{dashboardData.team_name}</p>
             </div>
-            <div className="info-item">
+            <div className="dashboard-info-item">
               <label>Category</label>
-              <p className="info-value">{dashboardData.category}</p>
+              <p className="dashboard-info-value">{dashboardData.category}</p>
             </div>
             {dashboardData.subcategory && (
-              <div className="info-item">
+              <div className="dashboard-info-item">
                 <label>Subcategory</label>
-                <p className="info-value">{dashboardData.subcategory}</p>
+                <p className="dashboard-info-value">{dashboardData.subcategory}</p>
               </div>
             )}
-            <div className="info-item">
+            <div className="dashboard-info-item">
               <label>University Roll No</label>
-              <p className="info-value">{dashboardData.university_roll_no || "N/A"}</p>
+              <p className="dashboard-info-value">{dashboardData.university_roll_no || "N/A"}</p>
             </div>
           </div>
 
           {/* Team Leader */}
           {dashboardData.team_leader && (
-            <div className="leader-section">
+            <div className="dashboard-leader-section">
               <h3>Team Leader</h3>
-              <div className="leader-card">
-                <div className="leader-avatar">
+              <div className="dashboard-leader-card">
+                <div className="dashboard-leader-avatar">
                   {dashboardData.team_leader.name.charAt(0)}
                 </div>
-                <div className="leader-info">
+                <div className="dashboard-leader-info">
                   <h4>{dashboardData.team_leader.name}</h4>
-                  <div className="leader-details">
-                    <div className="detail-item">
-                      <span className="detail-label">Email</span>
-                      <span className="detail-value">{dashboardData.team_leader.email}</span>
+                  <div className="dashboard-leader-details">
+                    <div className="dashboard-detail-item">
+                      <span className="dashboard-detail-label">Email</span>
+                      <span className="dashboard-detail-value">{dashboardData.team_leader.email}</span>
                     </div>
-                    <div className="detail-item">
-                      <span className="detail-label">Contact</span>
-                      <span className="detail-value">{dashboardData.team_leader.contact}</span>
+                    <div className="dashboard-detail-item">
+                      <span className="dashboard-detail-label">Contact</span>
+                      <span className="dashboard-detail-value">{dashboardData.team_leader.contact}</span>
                     </div>
                     {dashboardData.team_leader.roll_no && (
-                      <div className="detail-item">
-                        <span className="detail-label">Roll No</span>
-                        <span className="detail-value">{dashboardData.team_leader.roll_no}</span>
+                      <div className="dashboard-detail-item">
+                        <span className="dashboard-detail-label">Roll No</span>
+                        <span className="dashboard-detail-value">{dashboardData.team_leader.roll_no}</span>
                       </div>
                     )}
                   </div>
@@ -314,15 +310,15 @@ const Dashboard = () => {
 
           {/* Team Members */}
           {dashboardData.members?.length > 0 && (
-            <div className="members-section">
+            <div className="dashboard-members-section">
               <h3>Team Members ({dashboardData.members.length})</h3>
-              <div className="members-list">
+              <div className="dashboard-members-list">
                 {dashboardData.members.map((member, index) => (
-                  <div key={index} className="member-item">
-                    <div className="member-avatar">
+                  <div key={index} className="dashboard-member-item">
+                    <div className="dashboard-member-avatar">
                       {member.charAt(0)}
                     </div>
-                    <span className="member-name">{member}</span>
+                    <span className="dashboard-member-name">{member}</span>
                   </div>
                 ))}
               </div>
@@ -331,79 +327,38 @@ const Dashboard = () => {
         </div>
 
         {/* Project Section */}
-        <div className="dashboard-card project-section">
-          <div className="card-header">
+        <div className="dashboard-card dashboard-project-section">
+          <div className="dashboard-card-header">
             <h2>Project Details</h2>
-            <span className={`status-badge ${dashboardData.project_submitted ? 'submitted' : 'pending'}`}>
+            <span className={`dashboard-status-badge ${dashboardData.project_submitted ? 'submitted' : 'pending'}`}>
               {dashboardData.project_submitted ? 'Submitted' : 'Pending'}
             </span>
           </div>
 
-          <div className="project-content">
-            <div className="problem-statement-section">
+          <div className="dashboard-project-content">
+            <div className="dashboard-problem-statement-section">
               <h3>Problem Statement</h3>
-              <div className="statement-id">
-                <span className="id-label">ID:</span>
-                <span className="id-value">{dashboardData.problem_statement_id || "Not Assigned"}</span>
+              <div className="dashboard-statement-id">
+                <span className="dashboard-id-label">ID:</span>
+                <span className="dashboard-id-value">{dashboardData.problem_statement_id || "Not Assigned"}</span>
               </div>
-              <div className="statement-content">
+              <div className="dashboard-statement-content">
                 <p>{dashboardData.statement || "No problem statement assigned yet."}</p>
               </div>
             </div>
 
-            <div className="project-actions">
-              <button className="action-button primary">
+            <div className="dashboard-project-actions">
+              <button className="dashboard-action-btn primary">
                 View Full Statement
               </button>
-              <button className="action-button secondary">
+              <button className="dashboard-action-btn secondary">
                 Submit Project
               </button>
-              <button className="action-button outline">
+              <button className="dashboard-action-btn outline">
                 Download Resources
               </button>
             </div>
-
-            <div className="project-timeline">
-              <h3>Timeline</h3>
-              <div className="timeline-item">
-                <div className="timeline-dot active"></div>
-                <div className="timeline-content">
-                  <span className="timeline-title">Round {activeRound || 1}</span>
-                  <span className="timeline-date">Currently Active</span>
-                </div>
-              </div>
-              <div className="timeline-item">
-                <div className="timeline-dot"></div>
-                <div className="timeline-content">
-                  <span className="timeline-title">Project Submission</span>
-                  <span className="timeline-date">Due: {stats.nextDeadline}</span>
-                </div>
-              </div>
-            </div>
           </div>
-        </div>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="quick-actions">
-        <h2>Quick Actions</h2>
-        <div className="actions-grid">
-          <button className="action-card">
-            <div className="action-icon">📤</div>
-            <span className="action-title">Submit Project</span>
-          </button>
-          <button className="action-card">
-            <div className="action-icon">📝</div>
-            <span className="action-title">Edit Team Info</span>
-          </button>
-          <button className="action-card">
-            <div className="action-icon">👥</div>
-            <span className="action-title">Manage Members</span>
-          </button>
-          <button className="action-card">
-            <div className="action-icon">📄</div>
-            <span className="action-title">View Submissions</span>
-          </button>
         </div>
       </div>
     </Shell>

@@ -43,8 +43,10 @@
   object-fit: contain;
 }
 
+
+
 .admin-title {
-  font-size: 1.125rem;
+  font-size: 1.4rem;
   font-weight: 600;
   color: #1f2937;
   margin: 0;
@@ -168,6 +170,7 @@
 .nav-tab.active {
   color: #3b82f6;
   border-bottom-color: #3b82f6;
+  border-radius: 4px;
   background-color: #f8fafc;
 }
 
@@ -200,14 +203,22 @@
     position: relative;
   }
   
-  .admin-header-content {
+  /* .admin-header-content {
     padding: 1rem;
     height: 70px;
     flex-direction: column;
     gap: 12px;
     align-items: flex-start;
-  }
-  
+  } */
+  .admin-header-content {
+  padding: 0.75rem 1rem;
+  height: auto;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
   .admin-header-left {
     width: 100%;
     justify-content: space-between;

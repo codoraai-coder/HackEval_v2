@@ -1,269 +1,184 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "./Submission.css";
+import { API_BASE_URL } from "../config";
 
 const Submissions = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [statusMessage, setStatusMessage] = useState("");
+  const [analysis, setAnalysis] = useState(null);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
 
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
-
-  const handleGoogleForm = async () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      window.open("https://forms.gle/UmcmyMqyq5kZF7SD7", "_blank");
-      setIsLoading(false);
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 3000);
-    }, 500);
+  const handleFileChange = (e) => {
+    setSelectedFile(e.target.files?.[0] || null);
   };
 
-  const mockSubmissions = [
-    {
-      id: 1,
-      title: "Initial Project Proposal",
-      submittedAt: "2024-03-15 14:30",
-      status: "Reviewed",
-      feedback:
-        "Great initial concept! Please expand on the technical implementation details in your next submission.",
-    },
-    {
-      id: 2,
-      title: "Technical Documentation",
-      submittedAt: "2024-03-18 09:15",
-      status: "Pending Review",
-      feedback: null,
-    },
-    {
-      id: 3,
-      title: "Prototype Demo",
-      submittedAt: "2024-03-20 16:45",
-      status: "Approved",
-      feedback:
-        "Excellent work! The prototype demonstrates strong technical skills and innovation.",
-    },
-  ];
+  const submitFile = async () => {
+    if (!selectedFile) {
+      setStatusMessage("Please select a PPT or PDF file.");
+      return;
+    }
 
-  const getStatusColor = (status) => {
-    switch (status.toLowerCase()) {
-      case "approved":
-        return "#22c55e";
-      case "pending review":
-        return "#ffc107";
-      case "reviewed":
-        return "#17a2b8";
-      default:
-        return "#6c757d";
+    try {
+      setIsLoading(true);
+      setStatusMessage("");
+      const token = localStorage.getItem("token");
+      const team = JSON.parse(localStorage.getItem("team") || "{}");
+
+      if (!team?._id || !token) {
+        setStatusMessage("Session expired. Please sign in again.");
+        return;
+      }
+
+      const leaderEmail =
+        (team.members || []).find((m) => m.isLeader)?.email || team.email;
+
+      const fd = new FormData();
+      fd.append("pptFile", selectedFile);
+      fd.append("leaderEmail", leaderEmail);
+
+      const res = await fetch(
+        `${API_BASE_URL}/team/ppt/${team._id}/submit-ppt`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          body: fd,
+        },
+      );
+
+      const payload = await res.json();
+      if (!res.ok || !payload?.success) {
+        throw new Error(payload?.message || "Upload failed");
+      }
+
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 3000);
+    } catch (err) {
+      setStatusMessage(err.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const getStatusEmoji = (status) => {
-    switch (status.toLowerCase()) {
-      case "approved":
-        return "✅";
-      case "pending review":
-        return "⏳";
-      case "reviewed":
-        return "👁️";
-      default:
-        return "📄";
+  const checkAnalysis = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const team = JSON.parse(localStorage.getItem("team") || "{}");
+
+      const res = await fetch(
+        `${API_BASE_URL}/team/ppt/${team._id}/ppt-analysis`,
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+
+      const payload = await res.json();
+      if (!res.ok || !payload?.success) {
+        throw new Error(payload?.message || "Analysis not available yet");
+      }
+
+      setAnalysis(payload.data?.pptSubmission || null);
+    } catch (err) {
+      setStatusMessage(err.message);
     }
   };
 
   return (
-    <div className="submissions-page">
-      <div className={`submissions-container ${isVisible ? "visible" : ""}`}>
-        <h1>Project Submissions</h1>
+    <div className="team-schedule-container">
+      {/* Header */}
+      <div className="team-schedule-header">
+        <h1 className="team-schedule-title">
+          <span className="team-schedule-title-text">PROJECT SUBMISSION</span>
+          <span className="team-schedule-title-highlight"></span>
+        </h1>
 
-        <div className="submission-upload">
-          <h2>Submit Your Project</h2>
-          <p className="upload-description">
-            Ready to submit your project? Click the button below to access our
-            submission form. Make sure you have all your project files and
-            documentation ready!
-          </p>
+        <div className="team-schedule-timer">
+          <div className="team-schedule-timer-label">SUBMISSION STATUS</div>
+          <div className="team-schedule-timer-digits">
+            {analysis ? "EVALUATED" : "PENDING"}
+          </div>
+        </div>
+      </div>
+
+      {/* Section */}
+      <div className="team-schedule-section">
+        <div className="team-schedule-section-header team-schedule-gradient">
+          <div className="team-schedule-section-title">
+            <span className="team-schedule-section-number">01</span>
+            <span className="team-schedule-section-text">UPLOAD FILE</span>
+          </div>
+        </div>
+
+        <p className="submission-desc">
+          Upload your project PPT or PDF. Our system will analyze it and
+          generate evaluation insights.
+        </p>
+
+        <div className="submission-upload-row">
+          <label className="file-input-box">
+            <input
+              type="file"
+              accept=".ppt,.pptx,.pdf"
+              onChange={handleFileChange}
+              disabled={isLoading}
+              hidden
+            />
+            {selectedFile ? selectedFile.name : "📁 Choose File"}
+          </label>
 
           <button
-            className={`google-form-btn ${isLoading ? "loading" : ""}`}
-            onClick={handleGoogleForm}
-            disabled={isLoading}
+            className="submission-btn"
+            onClick={submitFile}
+            disabled={isLoading || !selectedFile}
           >
-            {isLoading ? (
-              <>
-                <span className="loading"></span>
-                Opening Form...
-              </>
-            ) : (
-              <>🚀 Go to Submission Form</>
-            )}
+            🚀 Upload & Analyze
+          </button>
+        </div>
+        {statusMessage && (
+          <div className="submission-error">{statusMessage}</div>
+        )}
+      </div>
+
+      {/* Analysis Section */}
+      <div className="team-schedule-section">
+        <div className="team-schedule-section-header team-schedule-gradient">
+          <div className="team-schedule-section-title">
+            <span className="team-schedule-section-number">02</span>
+            <span className="team-schedule-section-text">ANALYSIS RESULT</span>
+          </div>
+        </div>
+
+        <div className="analysis-card">
+          <button className="analysis-btn" onClick={checkAnalysis}>
+            🔍 Check Latest Analysis
           </button>
 
-          {showSuccess && (
-            <div className="success-message">
-              ✨ Submission form opened successfully! Complete your submission
-              there.
-            </div>
-          )}
-
-          <div className="submission-info-cards">
-            <div className="info-card">
-              <div className="info-icon">📋</div>
-              <h4>Prepare Documents</h4>
-              <p>Have your project files, documentation, and presentation ready</p>
-            </div>
-            <div className="info-card">
-              <div className="info-icon">⚡</div>
-              <h4>Quick Submission</h4>
-              <p>Our streamlined form makes submission fast and easy</p>
-            </div>
-            {/* <div className="info-card">
-              <div className="info-icon">🔒</div>
-              <h4>Secure Upload</h4>
-              <p>All submissions are securely stored and processed</p>
-            </div> */}
-          </div>
-        </div>
-
-        {/* <div className="submission-history">
-          <h2>Submission History</h2>
-          <p className="history-description">
-            Track all your project submissions and their review status below.
-          </p>
-
-          <div className="submissions-list">
-            {mockSubmissions.length > 0 ? (
-              mockSubmissions.map((submission) => (
-                <div key={submission.id} className="submission-card">
-                  <div className="submission-info">
-                    <h3>{submission.title}</h3>
-                    <p>
-                      <strong>Submitted:</strong> {submission.submittedAt}
-                    </p>
-                    <p>
-                      <strong>Status:</strong>
-                      <span
-                        className="status-badge"
-                        style={{
-                          color: getStatusColor(submission.status),
-                          backgroundColor: `${getStatusColor(
-                            submission.status
-                          )}15`,
-                          padding: "4px 12px",
-                          borderRadius: "20px",
-                          marginLeft: "8px",
-                          fontWeight: "600",
-                        }}
-                      >
-                        {getStatusEmoji(submission.status)}{" "}
-                        {submission.status}
-                      </span>
-                    </p>
-
-                    {submission.feedback && (
-                      <div className="feedback">
-                        <h4>Reviewer Feedback</h4>
-                        <p>{submission.feedback}</p>
-                      </div>
-                    )}
+          {analysis ? (
+            <div className="analysis-details">
+              <div>
+                <strong>Status:</strong> {analysis.analysisStatus}
+              </div>
+              {analysis.analysisDate && (
+                <div>
+                  <strong>Completed At:</strong>{" "}
+                  {new Date(analysis.analysisDate).toLocaleString()}
+                </div>
+              )}
+              {analysis.analysisResults && (
+                <>
+                  <div>
+                    <strong>Overall Score:</strong>{" "}
+                    {analysis.analysisResults.overall_score ?? "N/A"}
                   </div>
-
-                  <div className="submission-actions">
-                    <button
-                      className="download-btn"
-                      onClick={() =>
-                        alert("Download feature will be implemented soon!")
-                      }
-                    >
-                      Download
-                    </button>
-                    {submission.status === "Pending Review" && (
-                      <button
-                        className="edit-btn"
-                        onClick={() =>
-                          alert("Edit feature will be implemented soon!")
-                        }
-                      >
-                        ✏️ Edit
-                      </button>
-                    )}
+                  <div>
+                    <strong>Summary:</strong>{" "}
+                    {analysis.analysisResults.summary ?? "N/A"}
                   </div>
-                </div>
-              ))
-            ) : (
-              <div className="no-submissions">
-                <div className="no-submissions-icon">📭</div>
-                <h3>No Submissions Yet</h3>
-                <p>
-                  You haven't made any submissions yet. Click the button above
-                  to get started!
-                </p>
-              </div>
-            )}
-          </div>
-
-          {mockSubmissions.length > 0 && (
-            <div className="submission-stats">
-              <div className="stat-card">
-                <div className="stat-number">{mockSubmissions.length}</div>
-                <div className="stat-label">Total Submissions</div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-number">
-                  {mockSubmissions.filter((s) => s.status === "Approved")
-                    .length}
-                </div>
-                <div className="stat-label">Approved</div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-number">
-                  {
-                    mockSubmissions.filter(
-                      (s) => s.status === "Pending Review"
-                    ).length
-                  }
-                </div>
-                <div className="stat-label">Pending</div>
-              </div>
+                </>
+              )}
             </div>
+          ) : (
+            <p className="analysis-empty">No analysis available yet.</p>
           )}
         </div>
-
-        <div className="submission-tips">
-          <h3>💡 Submission Tips</h3>
-          <div className="tips-grid">
-            <div className="tip-item">
-              <span className="tip-icon">📝</span>
-              <p>
-                <strong>Clear Documentation:</strong> Include comprehensive
-                project documentation with your submission.
-              </p>
-            </div>
-            <div className="tip-item">
-              <span className="tip-icon">🎥</span>
-              <p>
-                <strong>Demo Video:</strong> Consider including a demo video to
-                showcase your project's functionality.
-              </p>
-            </div>
-            <div className="tip-item">
-              <span className="tip-icon">🔍</span>
-              <p>
-                <strong>Review Guidelines:</strong> Make sure your submission
-                meets all the competition requirements.
-              </p>
-            </div>
-            <div className="tip-item">
-              <span className="tip-icon">⏰</span>
-              <p>
-                <strong>Submit Early:</strong> Don't wait until the last minute
-                - submit early to avoid technical issues.
-              </p>
-              <div style={{ height: "64px" }} />
-            </div>
-          </div>
-        </div> */}
       </div>
     </div>
   );

@@ -74,7 +74,7 @@ const Dashboard = () => {
         const data = await res.json();
         if (!isMounted) return;
         setActiveRound((prev) => (prev !== data.round ? data.round : prev));
-      } catch {}
+      } catch { }
     };
 
     // initial fetch
@@ -560,7 +560,7 @@ const Dashboard = () => {
                 </thead>
                 <tbody>
                   {displayedPpt.map((row) => (
-                    <tr key={`${row.team_name}-${row.rank}`}>
+                    <tr key={`${row.teamName || row.team_name}-${row.rank}`}>
                       <td>
                         {row.rank <= 3 ? (
                           <span title={`Rank ${row.rank}`}>
@@ -581,7 +581,7 @@ const Dashboard = () => {
                         )}
                       </td>
                       <td>
-                        <strong>{row.team_name}</strong>
+                        <strong>{row.teamName || row.team_name}</strong>
                       </td>
                       <td style={{ textAlign: "right" }}>{row.total_score}</td>
                     </tr>

@@ -70,10 +70,12 @@ const ExcelUpload = () => {
       const formData = new FormData();
       formData.append("file", file);
 
+      const token = localStorage.getItem("authToken");
       const response = await fetch(
-        `${API_BASE_URL}/routes/upload_excel/`,
+        `${API_BASE_URL}/admin/upload/teams`,
         {
           method: "POST",
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
           body: formData,
         },
       );
@@ -82,14 +84,15 @@ const ExcelUpload = () => {
 
       if (!response.ok) {
         throw new Error(
-          result.detail || "Failed to upload file. Server returned an error.",
+          result.detail || result.message || "Failed to upload file. Server returned an error.",
         );
       }
 
+      const data = result.data || result;
       setUploadStatus({
         type: "success",
-        message: result.message,
-        details: result.skipped_details || [],
+        message: result.message || `Upload complete: ${data.created || 0} created, ${data.updated || 0} updated`,
+        details: data.skipped || [],
       });
     } catch (error) {
       console.error("Error uploading file:", error);
@@ -127,7 +130,7 @@ const ExcelUpload = () => {
                 <li>Team_Memeber_5</li>
                 <li>PSID</li>
                 <li>Statement</li>
-                </b>
+              </b>
               </ul>
             </li>
             <li>
@@ -160,11 +163,10 @@ const ExcelUpload = () => {
 
         <div className="mb-6">
           <div
-            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors duration-200 ${
-              loading
+            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors duration-200 ${loading
                 ? "border-gray-300 bg-gray-50"
                 : "border-gray-300 hover:border-blue-500"
-            }`}
+              }`}
           >
             <input
               type="file"

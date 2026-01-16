@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { 
-  Users, 
-  Calendar, 
-  Trophy, 
-  UserCheck, 
-  TrendingUp, 
+import {
+  Users,
+  Calendar,
+  Trophy,
+  UserCheck,
+  TrendingUp,
   Clock,
   CheckCircle,
   AlertCircle,
@@ -14,6 +14,8 @@ import {
   Database
 } from 'lucide-react';
 import './Dashboard.css';
+import { API_BASE_URL } from '../config';
+
 
 const Dashboard = () => {
   const [isUploading, setIsUploading] = useState(false);
@@ -40,10 +42,10 @@ const Dashboard = () => {
       try {
         setPptLoading(true);
         setPptError('');
-        const res = await fetch('http://localhost:8000/leaderboard/ppt');
+        const res = await fetch(`${API_BASE_URL}/leaderboard/ppt`);
         if (!res.ok) throw new Error('Failed to load PPT leaderboard');
         const data = await res.json();
-        setPptLeaders(data);
+        setPptLeaders(data.data || data || []);
       } catch (e) {
         setPptError(e.message || 'Error loading leaderboard');
       } finally {
@@ -59,15 +61,15 @@ const Dashboard = () => {
 
     const fetchActiveRound = async () => {
       try {
-        const token = localStorage.getItem('token');
-        const res = await fetch('http://localhost:8000/round-state/active', {
+        const token = localStorage.getItem('authToken');
+        const res = await fetch(`${API_BASE_URL}/round-state/active`, {
           headers: token ? { 'Authorization': `Bearer ${token}` } : undefined
         });
         if (!res.ok) return;
         const data = await res.json();
         if (!isMounted) return;
         setActiveRound((prev) => (prev !== data.round ? data.round : prev));
-      } catch {}
+      } catch { }
     };
 
     // initial fetch
@@ -84,8 +86,8 @@ const Dashboard = () => {
   const setRound = async (round) => {
     try {
       setRoundBusy(true);
-      const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:8000/round-state/active', {
+      const token = localStorage.getItem('authToken');
+      const res = await fetch(`${API_BASE_URL}/round-state/active`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -105,7 +107,7 @@ const Dashboard = () => {
 
   const filteredPpt = pptLeaders
     .filter((row) =>
-      pptAppliedSearch === '' || (row.team_name || '').toLowerCase().includes(pptAppliedSearch.toLowerCase())
+      pptAppliedSearch === '' || (row.teamName || row.team_name || '').toLowerCase().includes(pptAppliedSearch.toLowerCase())
     )
     .sort((a, b) => a.rank - b.rank);
 
@@ -230,17 +232,19 @@ const Dashboard = () => {
       // Backend expects field name "file"
       formData.append('file', selectedFile);
 
-      const response = await fetch('/api/upload-ppt-report', {
+      const token = localStorage.getItem('authToken');
+      const response = await fetch(`${API_BASE_URL}/admin/upload/ppt-report`, {
         method: 'POST',
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {},
         body: formData,
       });
 
       const result = await response.json();
 
       if (response.ok) {
-        setUploadStatus({ 
-          type: 'success', 
-          message: `Successfully updated! ${result.total_records} records processed.` 
+        setUploadStatus({
+          type: 'success',
+          message: `Successfully updated! ${result.total_records} records processed.`
         });
         setLastUpdate(new Date().toLocaleString());
         setSelectedFile(null);
@@ -248,15 +252,15 @@ const Dashboard = () => {
           fileInputRef.current.value = '';
         }
       } else {
-        setUploadStatus({ 
-          type: 'error', 
-          message: result.detail || result.error || 'Upload failed. Please try again.' 
+        setUploadStatus({
+          type: 'error',
+          message: result.detail || result.error || 'Upload failed. Please try again.'
         });
       }
     } catch (error) {
-      setUploadStatus({ 
-        type: 'error', 
-        message: 'Network error. Please check your connection.' 
+      setUploadStatus({
+        type: 'error',
+        message: 'Network error. Please check your connection.'
       });
     } finally {
       setIsUploading(false);
@@ -294,7 +298,7 @@ const Dashboard = () => {
             Last updated: {lastUpdate}
           </div>
         </div>
-        
+
         <div className="upload-container">
           <div className="file-input-wrapper">
             <input
@@ -310,7 +314,7 @@ const Dashboard = () => {
               {selectedFile ? selectedFile.name : 'Choose PPT Report Excel File'}
             </label>
           </div>
-          
+
           <div className="upload-actions">
             <button
               onClick={handleUpload}
@@ -329,7 +333,7 @@ const Dashboard = () => {
                 </>
               )}
             </button>
-            
+
             <button
               onClick={handleRefresh}
               className="refresh-btn"
@@ -468,7 +472,7 @@ const Dashboard = () => {
                 </thead>
                 <tbody>
                   {displayedPpt.map((row) => (
-                    <tr key={`${row.team_name}-${row.rank}`}>
+                    <tr key={`${row.teamName || row.team_name}-${row.rank}`}>
                       <td>
                         {row.rank <= 3 ? (
                           <span title={`Rank ${row.rank}`}>
@@ -479,10 +483,10 @@ const Dashboard = () => {
                         )}
                       </td>
                       <td>
-                        <strong>{row.team_name}</strong>
+                        <strong>{row.teamName || row.team_name}</strong>
                       </td>
                       <td style={{ textAlign: 'right' }}>
-                        {row.total_score}
+                        {row.score || row.total_score}
                       </td>
                     </tr>
                   ))}

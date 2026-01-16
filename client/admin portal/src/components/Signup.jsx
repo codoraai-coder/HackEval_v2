@@ -63,7 +63,7 @@
 //         endpoint = `${API_BASE_URL}/judge/register`;
 //         // Generate a simple ID for the judge (backend will handle proper ID generation)
 //         const judgeId = `judge_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        
+
 //         requestBody = {
 //           id: judgeId,
 //           name: formData.name,
@@ -133,7 +133,7 @@
 //               <span>{error}</span>
 //             </div>
 //           )}
-          
+
 //           {success && (
 //             <div className="alert alert-success" style={{ marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
 //               <CheckCircle size={16} />
@@ -321,8 +321,8 @@
 
 import React, { useState } from 'react';
 import { UserPlus, Mail, Lock, User, AlertCircle, CheckCircle } from 'lucide-react';
+import { API_BASE_URL } from '../config';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
 const AdminSignup = ({ onSignupSuccess, onBackToLogin, userType = 'admin' }) => {
   const [formData, setFormData] = useState({
@@ -400,8 +400,8 @@ const AdminSignup = ({ onSignupSuccess, onBackToLogin, userType = 'admin' }) => 
   };
 
   return (
-    <div className="dashboard-card" style={{ 
-      maxWidth: '450px', 
+    <div className="dashboard-card" style={{
+      maxWidth: '450px',
       margin: '2rem auto',
       padding: '2rem'
     }}>
@@ -410,18 +410,18 @@ const AdminSignup = ({ onSignupSuccess, onBackToLogin, userType = 'admin' }) => 
           {userType === 'admin' ? 'Create Admin Account' : 'Create Judge Account'}
         </h3>
         <p className="page-subtitle">
-          {userType === 'admin' 
-            ? 'Set up your administrator account' 
+          {userType === 'admin'
+            ? 'Set up your administrator account'
             : 'Set up your judge account for evaluations'
           }
         </p>
       </div>
-      
+
       {error && (
-        <div style={{ 
-          padding: '12px 16px', 
-          backgroundColor: '#fee', 
-          color: '#c33', 
+        <div style={{
+          padding: '12px 16px',
+          backgroundColor: '#fee',
+          color: '#c33',
           border: '1px solid #fcc',
           borderRadius: '8px',
           marginBottom: '16px',
@@ -433,12 +433,12 @@ const AdminSignup = ({ onSignupSuccess, onBackToLogin, userType = 'admin' }) => 
           <span>{error}</span>
         </div>
       )}
-      
+
       {success && (
-        <div style={{ 
-          padding: '12px 16px', 
-          backgroundColor: '#efe', 
-          color: '#363', 
+        <div style={{
+          padding: '12px 16px',
+          backgroundColor: '#efe',
+          color: '#363',
           border: '1px solid #cfc',
           borderRadius: '8px',
           marginBottom: '16px',
@@ -455,12 +455,12 @@ const AdminSignup = ({ onSignupSuccess, onBackToLogin, userType = 'admin' }) => 
         <div style={{ marginBottom: '16px' }}>
           <label className="form-label">Full Name</label>
           <div style={{ position: 'relative' }}>
-            <User size={18} style={{ 
-              position: 'absolute', 
-              left: '12px', 
-              top: '50%', 
-              transform: 'translateY(-50%)', 
-              color: '#666' 
+            <User size={18} style={{
+              position: 'absolute',
+              left: '12px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              color: '#666'
             }} />
             <input
               type="text"
@@ -478,12 +478,12 @@ const AdminSignup = ({ onSignupSuccess, onBackToLogin, userType = 'admin' }) => 
         <div style={{ marginBottom: '16px' }}>
           <label className="form-label">Email</label>
           <div style={{ position: 'relative' }}>
-            <Mail size={18} style={{ 
-              position: 'absolute', 
-              left: '12px', 
-              top: '50%', 
-              transform: 'translateY(-50%)', 
-              color: '#666' 
+            <Mail size={18} style={{
+              position: 'absolute',
+              left: '12px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              color: '#666'
             }} />
             <input
               type="email"
@@ -501,12 +501,12 @@ const AdminSignup = ({ onSignupSuccess, onBackToLogin, userType = 'admin' }) => 
         <div style={{ marginBottom: '16px' }}>
           <label className="form-label">Password</label>
           <div style={{ position: 'relative' }}>
-            <Lock size={18} style={{ 
-              position: 'absolute', 
-              left: '12px', 
-              top: '50%', 
-              transform: 'translateY(-50%)', 
-              color: '#666' 
+            <Lock size={18} style={{
+              position: 'absolute',
+              left: '12px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              color: '#666'
             }} />
             <input
               type="password"
@@ -525,12 +525,12 @@ const AdminSignup = ({ onSignupSuccess, onBackToLogin, userType = 'admin' }) => 
         <div style={{ marginBottom: '16px' }}>
           <label className="form-label">Confirm Password</label>
           <div style={{ position: 'relative' }}>
-            <Lock size={18} style={{ 
-              position: 'absolute', 
-              left: '12px', 
-              top: '50%', 
-              transform: 'translateY(-50%)', 
-              color: '#666' 
+            <Lock size={18} style={{
+              position: 'absolute',
+              left: '12px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              color: '#666'
             }} />
             <input
               type="password"
@@ -547,15 +547,15 @@ const AdminSignup = ({ onSignupSuccess, onBackToLogin, userType = 'admin' }) => 
         </div>
 
         <div className="action-buttons" style={{ marginTop: '16px' }}>
-          <button 
-            type="submit" 
-            className="btn-upload" 
+          <button
+            type="submit"
+            className="btn-upload"
             style={{ width: '100%', justifyContent: 'center' }}
             disabled={loading}
           >
             <UserPlus size={16} />
-            {loading 
-              ? `Creating ${userType} Account...` 
+            {loading
+              ? `Creating ${userType} Account...`
               : `Create ${userType.charAt(0).toUpperCase() + userType.slice(1)} Account`
             }
           </button>
@@ -563,11 +563,11 @@ const AdminSignup = ({ onSignupSuccess, onBackToLogin, userType = 'admin' }) => 
       </form>
 
       <div style={{ marginTop: '16px', textAlign: 'center' }}>
-        <button 
-          type="button" 
-          className="btn-upload" 
-          style={{ 
-            width: '100%', 
+        <button
+          type="button"
+          className="btn-upload"
+          style={{
+            width: '100%',
             justifyContent: 'center',
             backgroundColor: 'transparent',
             color: '#667eea',
@@ -582,11 +582,11 @@ const AdminSignup = ({ onSignupSuccess, onBackToLogin, userType = 'admin' }) => 
       {userType === 'admin' && (
         <div style={{ marginTop: '12px', textAlign: 'center' }}>
           <p style={{ marginBottom: '8px', color: '#666' }}>Need to create a judge account?</p>
-          <button 
-            type="button" 
-            className="btn-upload" 
-            style={{ 
-              width: '100%', 
+          <button
+            type="button"
+            className="btn-upload"
+            style={{
+              width: '100%',
               justifyContent: 'center',
               backgroundColor: 'transparent',
               color: '#667eea',
@@ -602,11 +602,11 @@ const AdminSignup = ({ onSignupSuccess, onBackToLogin, userType = 'admin' }) => 
       {userType === 'judge' && (
         <div style={{ marginTop: '12px', textAlign: 'center' }}>
           <p style={{ marginBottom: '8px', color: '#666' }}>Need to create an admin account?</p>
-          <button 
-            type="button" 
-            className="btn-upload" 
-            style={{ 
-              width: '100%', 
+          <button
+            type="button"
+            className="btn-upload"
+            style={{
+              width: '100%',
               justifyContent: 'center',
               backgroundColor: 'transparent',
               color: '#667eea',

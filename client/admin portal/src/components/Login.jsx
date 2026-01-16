@@ -4,8 +4,8 @@
 
 import React, { useState } from 'react';
 import { Lock, Mail, Loader, AlertCircle } from 'lucide-react';
+import { API_BASE_URL } from '../config';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
 const AdminLogin = ({ onLogin }) => {
   const [formData, setFormData] = useState({
@@ -59,15 +59,15 @@ const AdminLogin = ({ onLogin }) => {
       localStorage.setItem('authUser', JSON.stringify(user || { email: formData.email }));
       localStorage.setItem('userType', 'admin');
       localStorage.setItem('userEmail', formData.email);
-      
+
       // Call the parent callback with user info
-      onLogin({ 
-        email: formData.email, 
+      onLogin({
+        email: formData.email,
         userType: 'admin',
         token: accessToken,
         ...(user || {})
       });
-      
+
     } catch (err) {
       setError(err.message || 'Login failed. Please check your credentials.');
       console.error('Login error:', err);
@@ -77,8 +77,8 @@ const AdminLogin = ({ onLogin }) => {
   };
 
   return (
-    <div className="dashboard-card" style={{ 
-      maxWidth: '400px', 
+    <div className="dashboard-card" style={{
+      maxWidth: '400px',
       margin: '2rem auto',
       padding: '2rem'
     }}>
@@ -86,12 +86,12 @@ const AdminLogin = ({ onLogin }) => {
         <h3 className="page-title">Admin Login</h3>
         <p className="page-subtitle">Use your credentials to continue</p>
       </div>
-      
+
       {error && (
-        <div style={{ 
-          padding: '12px 16px', 
-          backgroundColor: '#fee', 
-          color: '#c33', 
+        <div style={{
+          padding: '12px 16px',
+          backgroundColor: '#fee',
+          color: '#c33',
           border: '1px solid #fcc',
           borderRadius: '8px',
           marginBottom: '16px',
@@ -103,17 +103,17 @@ const AdminLogin = ({ onLogin }) => {
           <span>{error}</span>
         </div>
       )}
-      
+
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: '16px' }}>
           <label className="form-label">Email</label>
           <div style={{ position: 'relative' }}>
-            <Mail size={18} style={{ 
-              position: 'absolute', 
-              left: '12px', 
-              top: '50%', 
-              transform: 'translateY(-50%)', 
-              color: '#666' 
+            <Mail size={18} style={{
+              position: 'absolute',
+              left: '12px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              color: '#666'
             }} />
             <input
               type="email"
@@ -127,16 +127,16 @@ const AdminLogin = ({ onLogin }) => {
             />
           </div>
         </div>
-        
+
         <div style={{ marginBottom: '16px' }}>
           <label className="form-label">Password</label>
           <div style={{ position: 'relative' }}>
-            <Lock size={18} style={{ 
-              position: 'absolute', 
-              left: '12px', 
-              top: '50%', 
-              transform: 'translateY(-50%)', 
-              color: '#666' 
+            <Lock size={18} style={{
+              position: 'absolute',
+              left: '12px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              color: '#666'
             }} />
             <input
               type="password"
@@ -150,11 +150,11 @@ const AdminLogin = ({ onLogin }) => {
             />
           </div>
         </div>
-        
+
         <div className="action-buttons" style={{ marginTop: '16px' }}>
-          <button 
-            type="submit" 
-            className="btn-upload" 
+          <button
+            type="submit"
+            className="btn-upload"
             style={{ width: '100%', justifyContent: 'center' }}
             disabled={loading}
           >
@@ -166,11 +166,11 @@ const AdminLogin = ({ onLogin }) => {
 
       <div style={{ marginTop: '16px', textAlign: 'center' }}>
         <p style={{ marginBottom: '8px', color: '#666' }}>Don't have an admin account?</p>
-        <button 
-          type="button" 
-          className="btn-upload" 
-          style={{ 
-            width: '100%', 
+        <button
+          type="button"
+          className="btn-upload"
+          style={{
+            width: '100%',
             justifyContent: 'center',
             backgroundColor: 'transparent',
             color: '#667eea',

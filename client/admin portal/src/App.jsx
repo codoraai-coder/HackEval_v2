@@ -49,12 +49,12 @@
 //         setActiveRound(data.round);
 //       } catch {}
 //     };
-    
+
 //     if (isAuthenticated) {
 //       fetchActive();
 //       timerId = setInterval(fetchActive, 5000);
 //     }
-    
+
 //     return () => { 
 //       mounted = false; 
 //       if (timerId) clearInterval(timerId); 
@@ -97,7 +97,7 @@
 //     if (!isAuthenticated) {
 //       return <Navigate to="/login" replace />;
 //     }
-    
+
 //     if (adminOnly && userInfo.userType !== 'admin') {
 //       return (
 //         <div className="container">
@@ -106,7 +106,7 @@
 //         </div>
 //       );
 //     }
-    
+
 //     return children;
 //   };
 
@@ -308,26 +308,26 @@ function App() {
         const data = await res.json();
         if (!mounted) return;
         setActiveRound(data.round);
-      } catch {}
+      } catch { }
     };
-    
+
     if (isAuthenticated) {
       fetchActive();
       timerId = setInterval(fetchActive, 5000);
     }
-    
-    return () => { 
-      mounted = false; 
-      if (timerId) clearInterval(timerId); 
+
+    return () => {
+      mounted = false;
+      if (timerId) clearInterval(timerId);
     };
   }, [isAuthenticated]);
 
   const handleLogin = (user) => {
     try {
       localStorage.setItem('authUser', JSON.stringify(user));
-      localStorage.setItem('authToken', user.token);
+      localStorage.setItem('authToken', user.accessToken);
       setUserInfo(user);
-    } catch {}
+    } catch { }
     setIsAuthenticated(true);
     setSidebarOpen(false);
   };
@@ -338,7 +338,7 @@ function App() {
       localStorage.removeItem('authToken');
       localStorage.removeItem('userType');
       localStorage.removeItem('userEmail');
-    } catch {}
+    } catch { }
     setIsAuthenticated(false);
     setUserInfo({});
     setSidebarOpen(false);
@@ -358,8 +358,10 @@ function App() {
     if (!isAuthenticated) {
       return <Navigate to="/login" replace />;
     }
-    
-    if (adminOnly && userInfo.userType !== 'admin') {
+
+    // Backend returns user data nested in 'user' object and uses 'role' instead of 'userType'
+    const userRole = userInfo.user?.role || userInfo.role || userInfo.userType;
+    if (adminOnly && userRole !== 'admin') {
       return (
         <div className="container">
           <h2>Access Denied</h2>
@@ -367,7 +369,7 @@ function App() {
         </div>
       );
     }
-    
+
     return children;
   };
 
@@ -379,9 +381,9 @@ function App() {
         )}
         <div className="main-content">
           {isAuthenticated && (
-            <Header 
-              onMenuClick={() => setSidebarOpen(!sidebarOpen)} 
-              onLogout={handleLogout} 
+            <Header
+              onMenuClick={() => setSidebarOpen(!sidebarOpen)}
+              onLogout={handleLogout}
               activeRound={activeRound}
               userEmail={userInfo.email}
               userType={userInfo.userType}
@@ -415,7 +417,7 @@ function App() {
                   isAuthenticated ? (
                     <Navigate to="/dashboard" replace />
                   ) : (
-                    <AdminSignup 
+                    <AdminSignup
                       onSignupSuccess={() => window.location.href = '/login'}
                       onBackToLogin={() => window.location.href = '/login'}
                     />
@@ -428,7 +430,7 @@ function App() {
                   isAuthenticated ? (
                     <Navigate to="/dashboard" replace />
                   ) : (
-                    <AdminSignup 
+                    <AdminSignup
                       userType="judge"
                       onSignupSuccess={() => window.location.href = '/login'}
                       onBackToLogin={() => window.location.href = '/login'}

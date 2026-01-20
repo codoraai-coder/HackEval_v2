@@ -16,6 +16,7 @@ import pptLeaderboardRouter from "./routes/leaderboard/pptLeaderboard.route.js";
 import leaderboardRouter from "./routes/leaderboard.route.js";
 import roundStateRouter from "./routes/roundState.route.js";
 import uploadRouter from "./routes/admin/upload.route.js";
+import dashboardRouter from "./routes/admin/dashboard.route.js";
 
 const app = express();
 
@@ -53,6 +54,7 @@ app.use("/leaderboard", pptLeaderboardRouter);
 app.use("/leaderboard", leaderboardRouter);
 app.use("/round-state", roundStateRouter);
 app.use("/admin/upload", uploadRouter);
+app.use("/admin/dashboard", dashboardRouter);
 
 // Centralized error handler so frontend always gets JSON
 app.use((err, req, res, next) => {

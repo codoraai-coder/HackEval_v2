@@ -45,7 +45,12 @@ const Leaderboard = () => {
       setError("");
       const res = await fetch("http://localhost:8000/leaderboard/ppt");
       if (!res.ok) throw new Error("Failed to load leaderboard");
-      const data = await res.json();
+      const response = await res.json();
+
+      // Extract the actual data array from the response
+      // The API returns { status, data, message } format
+      const data = Array.isArray(response) ? response : (response.data || []);
+
       // Normalize into UI structure - preserve the rank from backend
       const mapped = data.map((item) => ({
         id: item.team_name,

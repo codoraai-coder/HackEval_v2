@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { 
-  Search, 
+import React, { useState, useEffect } from 'react';
+import {
+  Search,
   Trophy,
   Users,
   Star,
@@ -15,70 +15,43 @@ import './FinalSubmissionList.css';
 const FinalSubmissionList = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
+  const [finalSubmissions, setFinalSubmissions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [selectedSubmission, setSelectedSubmission] = useState(null);
 
-  // Mock final submissions data
-  const finalSubmissions = [
-    {
-      id: 'FS-001',
-      teamName: 'Team Innovators',
-      projectName: 'Smart Waste Management',
-      category: 'Smart Cities',
-      averageScore: 8.7,
-      totalEvaluators: 3,
-      // uniquenessScore: 85,
-      // plagiarismScore: 12,
-      submissionDate: '2024-01-15',
-      pptLink: 'https://docs.google.com/presentation/d/example1',
-      abstract: 'An intelligent waste management system using IoT sensors and AI to optimize collection routes and reduce environmental impact. The system reduces operational costs by 30% and improves collection efficiency by 45%.',
-      techStack: ['React', 'Node.js', 'Python', 'TensorFlow', 'IoT Sensors', 'MongoDB']
-    },
-    {
-      id: 'FS-002',
-      teamName: 'TechVision',
-      projectName: 'Healthcare Monitoring System',
-      category: 'Healthcare',
-      averageScore: 9.1,
-      totalEvaluators: 3,
-      // uniquenessScore: 92,
-      // plagiarismScore: 8,
-      submissionDate: '2024-01-13',
-      pptLink: 'https://docs.google.com/presentation/d/example2',
-      abstract: 'A comprehensive healthcare monitoring platform that provides real-time patient data analysis and predictive health insights.',
-      techStack: ['React Native', 'Python', 'Machine Learning', 'AWS', 'PostgreSQL']
-    },
-    {
-      id: 'FS-003',
-      teamName: 'DataMasters',
-      projectName: 'Predictive Analytics Dashboard',
-      category: 'Data Science',
-      averageScore: 8.3,
-      totalEvaluators: 3,
-      // uniquenessScore: 78,
-      // plagiarismScore: 15,
-      submissionDate: '2024-01-14',
-      pptLink: 'https://docs.google.com/presentation/d/example3',
-      abstract: 'Advanced analytics dashboard for business intelligence with predictive modeling capabilities.',
-      techStack: ['Vue.js', 'Python', 'Pandas', 'Scikit-learn', 'Docker', 'Redis']
-    },
-    {
-      id: 'FS-004',
-      teamName: 'EcoTech',
-      projectName: 'Renewable Energy Optimizer',
-      category: 'Sustainability',
-      averageScore: 8.9,
-      totalEvaluators: 3,
-      // uniquenessScore: 88,
-      // plagiarismScore: 10,
-      submissionDate: '2024-01-12',
-      pptLink: 'https://docs.google.com/presentation/d/example4',
-      abstract: 'AI-powered system for optimizing renewable energy production and distribution in smart grids.',
-      techStack: ['Angular', 'Java', 'Spring Boot', 'Apache Kafka', 'InfluxDB']
-    }
-  ];
+  // Fetch final submissions from API
+  useEffect(() => {
+    const fetchSubmissions = async () => {
+      try {
+        setLoading(true);
+        setError('');
+        const token = localStorage.getItem('authToken');
+        const res = await fetch('http://localhost:8000/admin/dashboard/final-submissions', {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+
+        if (!res.ok) {
+          throw new Error('Failed to fetch submissions');
+        }
+
+        const data = await res.json();
+        const submissions = data.data || data || [];
+        setFinalSubmissions(submissions);
+      } catch (err) {
+        setError(err.message || 'Error loading submissions');
+        console.error('Error fetching submissions:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSubmissions();
+  }, []);
 
   const filteredSubmissions = finalSubmissions.filter(submission => {
     const matchesSearch = submission.teamName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         submission.projectName.toLowerCase().includes(searchTerm.toLowerCase());
+      submission.projectName.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = filterCategory === 'all' || submission.category.toLowerCase() === filterCategory;
     return matchesSearch && matchesFilter;
   });
@@ -110,7 +83,7 @@ const FinalSubmissionList = () => {
               <FileText size={24} />
             </div>
             <div className="stat-content">
-              <h3>{finalSubmissions.length}</h3>
+              <h3>{loading ? '...' : finalSubmissions.length}</h3>
               <p>Final Submissions</p>
             </div>
           </div>
@@ -119,7 +92,11 @@ const FinalSubmissionList = () => {
               <Star size={24} />
             </div>
             <div className="stat-content">
-              <h3>8.8</h3>
+              <h3>
+                {loading ? '...' : finalSubmissions.length > 0
+                  ? (finalSubmissions.reduce((sum, s) => sum + s.averageScore, 0) / finalSubmissions.length).toFixed(1)
+                  : '0'}
+              </h3>
               <p>Average Score</p>
             </div>
           </div>
@@ -128,12 +105,39 @@ const FinalSubmissionList = () => {
               <Trophy size={24} />
             </div>
             <div className="stat-content">
-              <h3>4</h3>
+              <h3>
+                {loading ? '...' : new Set(finalSubmissions.map(s => s.category)).size}
+              </h3>
               <p>Categories</p>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Error Message */}
+      {error && (
+        <div className="error-state" style={{
+          background: '#fee',
+          color: '#c33',
+          padding: '16px',
+          borderRadius: '8px',
+          marginBottom: '16px',
+          textAlign: 'center'
+        }}>
+          <p>{error}</p>
+        </div>
+      )}
+
+      {/* Loading State */}
+      {loading && (
+        <div className="loading-state" style={{
+          textAlign: 'center',
+          padding: '40px',
+          color: 'var(--muted)'
+        }}>
+          <p>Loading submissions...</p>
+        </div>
+      )}
 
       {/* Filters and Search */}
       <div className="filters-section card">
@@ -237,7 +241,7 @@ const FinalSubmissionList = () => {
                 <Download size={16} />
                 Download
               </button>
-              <button className="btn btn-primary">
+              <button className="btn btn-primary" onClick={() => setSelectedSubmission(submission)}>
                 <Trophy size={16} />
                 View Details
               </button>
@@ -250,6 +254,144 @@ const FinalSubmissionList = () => {
         <div className="empty-state">
           <h3>No final submissions found</h3>
           <p>Try adjusting your search or filter criteria.</p>
+        </div>
+      )}
+
+      {/* Details Modal */}
+      {selectedSubmission && (
+        <div className="modal-overlay" onClick={() => setSelectedSubmission(null)} style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.7)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{
+            background: 'white',
+            borderRadius: '12px',
+            padding: '32px',
+            maxWidth: '800px',
+            maxHeight: '90vh',
+            overflow: 'auto',
+            position: 'relative'
+          }}>
+            <button
+              onClick={() => setSelectedSubmission(null)}
+              style={{
+                position: 'absolute',
+                top: '16px',
+                right: '16px',
+                background: 'none',
+                border: 'none',
+                fontSize: '24px',
+                cursor: 'pointer',
+                color: '#666'
+              }}
+            >
+              ×
+            </button>
+
+            <h2 style={{ marginBottom: '8px' }}>{selectedSubmission.teamName}</h2>
+            <h3 style={{ color: '#666', marginBottom: '24px' }}>{selectedSubmission.projectName}</h3>
+
+            <div style={{ marginBottom: '24px' }}>
+              <div style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
+                <div>
+                  <strong>Category:</strong> {selectedSubmission.category}
+                </div>
+                <div>
+                  <strong>Score:</strong> {selectedSubmission.averageScore}/10
+                </div>
+                <div>
+                  <strong>Evaluators:</strong> {selectedSubmission.totalEvaluators}
+                </div>
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '24px' }}>
+              <h4>Team Members</h4>
+              {selectedSubmission.members && selectedSubmission.members.length > 0 ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {selectedSubmission.members.map((member, index) => (
+                    <div key={index} style={{
+                      padding: '12px',
+                      background: member.isLeader ? '#e8f5e9' : '#f5f5f5',
+                      borderRadius: '8px',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center'
+                    }}>
+                      <div>
+                        <strong>{member.name}</strong>
+                        {member.isLeader && (
+                          <span style={{
+                            marginLeft: '8px',
+                            background: '#4caf50',
+                            color: 'white',
+                            padding: '2px 8px',
+                            borderRadius: '12px',
+                            fontSize: '12px'
+                          }}>
+                            Leader
+                          </span>
+                        )}
+                      </div>
+                      <div style={{ color: '#666', fontSize: '14px' }}>
+                        {member.email || 'No email'}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p style={{ color: '#999' }}>No team members listed</p>
+              )}
+            </div>
+
+            <div style={{ marginBottom: '24px' }}>
+              <h4>Abstract</h4>
+              <p>{selectedSubmission.abstract}</p>
+            </div>
+
+
+            <div style={{ marginBottom: '24px' }}>
+              <h4>Tech Stack</h4>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                {selectedSubmission.techStack && selectedSubmission.techStack.length > 0 ? (
+                  selectedSubmission.techStack.map((tech, index) => (
+                    <span key={index} style={{
+                      background: '#e3f2fd',
+                      padding: '4px 12px',
+                      borderRadius: '16px',
+                      fontSize: '14px'
+                    }}>
+                      {tech}
+                    </span>
+                  ))
+                ) : (
+                  <p style={{ color: '#999' }}>No tech stack specified</p>
+                )}
+              </div>
+            </div>
+
+            {selectedSubmission.pptLink && (
+              <div style={{ marginTop: '24px' }}>
+                <a
+                  href={selectedSubmission.pptLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-primary"
+                >
+                  <ExternalLink size={16} />
+                  View Presentation
+                </a>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

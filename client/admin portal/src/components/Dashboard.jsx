@@ -132,72 +132,127 @@ const Dashboard = () => {
     setPptAppliedSearch("");
   };
 
-  const stats = [
+  // Dashboard stats state
+  const [stats, setStats] = useState([
     {
       title: "Total Teams",
-      value: "24",
-      change: "+3",
-      changeType: "positive",
+      value: "0",
+      change: "0",
+      changeType: "neutral",
       icon: Users,
       color: "var(--primary-dark)",
     },
     {
       title: "Active Rounds",
-      value: "3",
-      change: "1 live",
+      value: "0",
+      change: "No active round",
       changeType: "info",
       icon: Calendar,
       color: "var(--info)",
     },
     {
       title: "Judges Assigned",
-      value: "12",
-      change: "+2",
-      changeType: "positive",
+      value: "0",
+      change: "0",
+      changeType: "neutral",
       icon: UserCheck,
       color: "var(--success)",
     },
     {
       title: "Average Score",
-      value: "8.5",
-      change: "+0.3",
-      changeType: "positive",
+      value: "0",
+      change: "No data",
+      changeType: "info",
       icon: Trophy,
       color: "var(--warning)",
     },
-  ];
+  ]);
 
-  const recentActivities = [
-    {
-      id: 1,
-      type: "round",
-      message: "Round 2 submissions deadline extended by 2 hours",
-      time: "2 hours ago",
-      status: "info",
-    },
-    {
-      id: 2,
-      type: "judge",
-      message: "Dr. Sarah Johnson assigned to Team Alpha",
-      time: "4 hours ago",
-      status: "success",
-    },
-    {
-      id: 3,
-      type: "score",
-      message: "Team Beta received perfect score in Round 1",
-      time: "6 hours ago",
-      status: "success",
-    },
-    {
-      id: 4,
-      type: "mentor",
-      message: "Mentor availability updated for tomorrow",
-      time: "1 day ago",
-      status: "info",
-    },
-  ];
+  // Fetch dashboard stats
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const token = localStorage.getItem("authToken");
+        const res = await fetch("http://localhost:8000/admin/dashboard/stats", {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        if (!res.ok) return;
+        const data = await res.json();
 
+        // Map backend data to stats format
+        const statsData = data.data || data;
+        setStats([
+          {
+            title: "Total Teams",
+            value: statsData.totalTeams?.value || "0",
+            change: statsData.totalTeams?.change || "0",
+            changeType: statsData.totalTeams?.changeType || "neutral",
+            icon: Users,
+            color: "var(--primary-dark)",
+          },
+          {
+            title: "Active Rounds",
+            value: statsData.activeRounds?.value || "0",
+            change: statsData.activeRounds?.change || "No active round",
+            changeType: "info",
+            icon: Calendar,
+            color: "var(--info)",
+          },
+          {
+            title: "Judges Assigned",
+            value: statsData.judgesAssigned?.value || "0",
+            change: statsData.judgesAssigned?.change || "0",
+            changeType: statsData.judgesAssigned?.changeType || "neutral",
+            icon: UserCheck,
+            color: "var(--success)",
+          },
+          {
+            title: "Average Score",
+            value: statsData.averageScore?.value || "0",
+            change: statsData.averageScore?.change || "No data",
+            changeType: "info",
+            icon: Trophy,
+            color: "var(--warning)",
+          },
+        ]);
+      } catch (error) {
+        console.error("Error fetching dashboard stats:", error);
+      }
+    };
+
+    fetchStats();
+    // Refresh stats every 30 seconds
+    const interval = setInterval(fetchStats, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Recent activities state
+  const [recentActivities, setRecentActivities] = useState([]);
+
+  // Fetch recent activities
+  useEffect(() => {
+    const fetchActivities = async () => {
+      try {
+        const token = localStorage.getItem("authToken");
+        const res = await fetch("http://localhost:8000/admin/dashboard/activities", {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        const activities = data.data || data || [];
+        setRecentActivities(activities.slice(0, 4)); // Show only 4 activities
+      } catch (error) {
+        console.error("Error fetching activities:", error);
+      }
+    };
+
+    fetchActivities();
+    // Refresh activities every 60 seconds
+    const interval = setInterval(fetchActivities, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Upcoming events - keeping as static for now (can be made dynamic later)
   const upcomingEvents = [
     {
       id: 1,
@@ -439,25 +494,32 @@ const Dashboard = () => {
         <div className="card-content">
           <div className="action-buttons" style={{ gap: 8, flexWrap: "wrap" }}>
             <button
-              className={`btn ${activeRound === 1 ? "btn-success" : "btn-secondary"}`}
+              className={`btn ${activeRound === "PPT" ? "btn-success" : "btn-secondary"}`}
               disabled={roundBusy}
-              onClick={() => setRound(1)}
+              onClick={() => setRound("PPT")}
             >
-              Round 1 {activeRound === 1 ? "(Active)" : ""}
+              PPT Round {activeRound === "PPT" ? "(Active)" : ""}
             </button>
             <button
-              className={`btn ${activeRound === 2 ? "btn-success" : "btn-secondary"}`}
+              className={`btn ${activeRound === "Round 1" ? "btn-success" : "btn-secondary"}`}
               disabled={roundBusy}
-              onClick={() => setRound(2)}
+              onClick={() => setRound("Round 1")}
             >
-              Round 2 {activeRound === 2 ? "(Active)" : ""}
+              Round 1 {activeRound === "Round 1" ? "(Active)" : ""}
             </button>
             <button
-              className={`btn ${activeRound === 3 ? "btn-success" : "btn-secondary"}`}
+              className={`btn ${activeRound === "Round 2" ? "btn-success" : "btn-secondary"}`}
               disabled={roundBusy}
-              onClick={() => setRound(3)}
+              onClick={() => setRound("Round 2")}
             >
-              Round 3 {activeRound === 3 ? "(Active)" : ""}
+              Round 2 {activeRound === "Round 2" ? "(Active)" : ""}
+            </button>
+            <button
+              className={`btn ${activeRound === "Round 3" ? "btn-success" : "btn-secondary"}`}
+              disabled={roundBusy}
+              onClick={() => setRound("Round 3")}
+            >
+              Round 3 {activeRound === "Round 3" ? "(Active)" : ""}
             </button>
             <button
               className="btn btn-warning"

@@ -37,10 +37,10 @@ export const uploadTeamsExcel = asyncHandler(async (req, res) => {
       try {
         // Map Excel columns to model fields (handle various column name formats)
         const teamName = row["Team Name"] || row["team name"] || row["teamName"];
-        const email = row["Team Leader Email id (gla email id only)"] || 
-                      row["Team Leader Email ID"] || 
-                      row["email"] || 
-                      row["Email"];
+        const email = row["Team Leader Email id (gla email id only)"] ||
+          row["Team Leader Email ID"] ||
+          row["email"] ||
+          row["Email"];
         const category = row["Select Category"] || row["category"] || row["Category"];
         const leaderName = row["Team Leader Name"] || row["leader"];
         const rollNo = row["University Roll No"] || row["rollNo"];
@@ -57,8 +57,8 @@ export const uploadTeamsExcel = asyncHandler(async (req, res) => {
         }
 
         // Check if team already exists
-        let team = await Team.findOne({ 
-          $or: [{ teamName }, { email: email.toLowerCase() }] 
+        let team = await Team.findOne({
+          $or: [{ teamName }, { email: email.toLowerCase() }]
         });
 
         if (team) {
@@ -74,7 +74,7 @@ export const uploadTeamsExcel = asyncHandler(async (req, res) => {
         } else {
           // Create new team with generated password
           const defaultPassword = `team_${Date.now().toString(36)}`;
-          
+
           team = await Team.create({
             teamName,
             email: email.toLowerCase(),
@@ -97,17 +97,20 @@ export const uploadTeamsExcel = asyncHandler(async (req, res) => {
           results.created++;
         }
 
-        // Add team members if present
+        // Add team members if present (skip members without emails since email is required)
         for (let i = 1; i <= 5; i++) {
           const memberName = row[`Team_Memeber_${i}`] || row[`Team_Member_${i}`];
-          if (memberName && memberName.trim()) {
-            const memberExists = team.members.some(m => 
-              m.name.toLowerCase() === memberName.trim().toLowerCase()
+          const memberEmail = row[`Team_Memeber_${i}_Email`] || row[`Team_Member_${i}_Email`];
+
+          // Only add member if both name and email are present
+          if (memberName && memberName.trim() && memberEmail && memberEmail.trim()) {
+            const memberExists = team.members.some(m =>
+              m.email.toLowerCase() === memberEmail.trim().toLowerCase()
             );
             if (!memberExists) {
               team.members.push({
                 name: memberName.trim(),
-                email: "",
+                email: memberEmail.trim().toLowerCase(),
                 isLeader: false
               });
             }
@@ -124,7 +127,7 @@ export const uploadTeamsExcel = asyncHandler(async (req, res) => {
     }
 
     return res.status(200).json(
-      new ApiResponse(200, results, 
+      new ApiResponse(200, results,
         `Upload complete: ${results.created} created, ${results.updated} updated, ${results.skipped.length} skipped`)
     );
 

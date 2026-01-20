@@ -32,15 +32,8 @@ const ExcelUpload = () => {
         h.trim().toLowerCase(),
       );
       const requiredColumns = [
-        "team id",
-        "select category",
         "team name",
-        "team leader name",
-        "university roll no",
         "team leader email id (gla email id only)",
-        "team leader contact no.",
-        "psid",
-        "statement",
       ];
       const missingColumns = requiredColumns.filter(
         (col) => !fileHeaders.includes(col),
@@ -115,13 +108,19 @@ const ExcelUpload = () => {
               team data.
             </li>
             <li>
-              Ensure all required columns are present with the exact names:
+              <strong>Required columns</strong> (must be present):
               <ul className="instructions-sublist"><b>
-                <li>Select Category</li>
                 <li>Team Name</li>
+                <li>Team Leader Email id (gla email id only)</li>
+              </b>
+              </ul>
+            </li>
+            <li>
+              <strong>Optional columns</strong> (recommended):
+              <ul className="instructions-sublist">
+                <li>Select Category</li>
                 <li>Team Leader Name</li>
                 <li>University Roll No</li>
-                <li>Team Leader Email id (gla email id only)</li>
                 <li>Team Leader Contact No.</li>
                 <li>Team_Memeber_1</li>
                 <li>Team_Memeber_2</li>
@@ -130,7 +129,6 @@ const ExcelUpload = () => {
                 <li>Team_Memeber_5</li>
                 <li>PSID</li>
                 <li>Statement</li>
-              </b>
               </ul>
             </li>
             <li>
@@ -164,8 +162,8 @@ const ExcelUpload = () => {
         <div className="mb-6">
           <div
             className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors duration-200 ${loading
-                ? "border-gray-300 bg-gray-50"
-                : "border-gray-300 hover:border-blue-500"
+              ? "border-gray-300 bg-gray-50"
+              : "border-gray-300 hover:border-blue-500"
               }`}
           >
             <input

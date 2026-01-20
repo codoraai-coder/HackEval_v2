@@ -6,8 +6,8 @@ import { Evaluation } from "../../models/judge/teamEvaluation.model.js";
 export const getPPTLeaderboard = asyncHandler(async (req, res) => {
   const teams = await Team.find({ isActive: true }).select("teamName pptSubmission");
 
-  // Get all judge evaluations
-  const evaluations = await Evaluation.find({ status: "submitted" });
+  // Get all judge evaluations (include all statuses)
+  const evaluations = await Evaluation.find();
 
   // Group evaluations by team
   const evalMap = {};

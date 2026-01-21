@@ -1,0 +1,145 @@
+
+
+.sidebar {
+  width: 260px;
+  background: #ffffff;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  height: calc(100vh - 72px);
+  top: 72px;
+  left: 0;
+  overflow-y: auto;
+  z-index: 20;
+  box-shadow: 4px 0 18px rgba(15, 23, 42, 0.04);
+}
+
+
+
+.sidebar-logo {
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  position: relative;
+}
+
+.sidebar-logo img {
+  width: 38px;
+  height: 38px;
+  transition: 0.4s ease;
+}
+
+
+.logo-text {
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: 0.4s ease;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.logo-text span {
+  display: block;
+  font-size: 11px;
+  color: #64748b;
+}
+
+/* Hover animation */
+.sidebar-logo:hover img {
+  transform: scale(1.25) rotate(6deg);
+}
+
+.sidebar-logo:hover .logo-text {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Close button (for mobile) */
+.sidebar-close {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  color: #64748b;
+  position: absolute;
+  right: 10px;
+  top: 16px;
+}
+
+.sidebar-close:hover {
+  background: #f1f5f9;
+  color: #2563eb;
+}
+
+/* ================= NAV ================= */
+
+.sidebar-nav {
+  flex: 1;
+  padding: 12px 8px;
+}
+
+.nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  margin: 4px 6px;
+  color: #334155;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.nav-link:hover {
+  background: #f1f5f9;
+  color: #2563eb;
+}
+
+.nav-link.active {
+  background: #eef2ff;
+  color: #2563eb;
+  font-weight: 600;
+  box-shadow: inset 3px 0 0 #2563eb;
+}
+
+.nav-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-label {
+  white-space: nowrap;
+}
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    position: relative;
+    height: auto;
+    top: 0;
+    border-right: none;
+    border-bottom: 1px solid #e5e7eb;
+    box-shadow: none;
+  }
+
+  .sidebar-close {
+    display: block;
+  }
+}

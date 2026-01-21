@@ -1,0 +1,226 @@
+/* Exact Layout - Team Dashboard 280px from left with 280px sidebar */
+:root {
+  --sidebar-width: 280px;
+  --header-height: 70px;
+  --primary-green: #1B4332;
+  --primary-green-light: #2d5a47;
+  --light-gray: #f8f9fa;
+  --white: #ffffff;
+}
+
+/* Layout Container - Sidebar + Main Content */
+.layout-container {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Sidebar - Fixed 280px width */
+.sidebar {
+  width: var(--sidebar-width);
+  background: var(--white);
+  border-right: 1px solid #e9ecef;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+/* Main Content Area - Positioned 280px from left */
+.main-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-left: var(--sidebar-width);
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Header - Positioned correctly */
+.header {
+  height: var(--header-height);
+  background: var(--white);
+  border-bottom: 1px solid #e9ecef;
+  padding: 0 25px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 200;
+}
+
+/* Team Dashboard - Positioned 280px from left */
+.team-dashboard {
+  flex: 1;
+  background: var(--light-gray);
+  padding: 25px;
+  overflow-y: auto;
+  height: calc(100vh - var(--header-height));
+}
+
+/* Dashboard Grid Layout */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.dashboard-grid-large {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+/* Sidebar Content */
+.sidebar-content {
+  padding: 20px 0;
+}
+
+.sidebar-header {
+  background: linear-gradient(135deg, var(--primary-green), var(--primary-green-light));
+  color: var(--white);
+  padding: 20px;
+  text-align: center;
+}
+
+.sidebar-nav {
+  padding: 20px 0;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px 20px;
+  color: #333;
+  text-decoration: none;
+  transition: all 0.2s;
+  border-left: 3px solid transparent;
+}
+
+.nav-item:hover {
+  background: #f8f9fa;
+  color: var(--primary-green);
+}
+
+.nav-item.active {
+  background: rgba(27, 67, 50, 0.1);
+  color: var(--primary-green);
+  border-left-color: var(--primary-green);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: -280px;
+    width: 280px;
+    height: 100vh;
+    z-index: 1000;
+    transition: left 0.3s ease;
+  }
+
+  .sidebar.open {
+    left: 0;
+  }
+
+  .main-container {
+    margin-left: 0;
+  }
+
+  .header {
+    padding: 0 15px;
+  }
+
+  .team-dashboard {
+    padding: 15px;
+  }
+
+  .dashboard-grid,
+  .dashboard-grid-large {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Sidebar overlay for mobile */
+.sidebar-overlay {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .sidebar-overlay {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+/* Utility Classes */
+.sidebar-collapsed {
+  width: 70px;
+}
+
+.main-content-expanded {
+  margin-left: 70px;
+}
+
+/* Exact positioning for team dashboard */
+.team-dashboard-exact {
+  position: absolute;
+  top: 70px;
+  left: 280px;
+  right: 0;
+  bottom: 0;
+  background: var(--light-gray);
+  padding: 25px;
+  overflow-y: auto;
+}
+
+/* Grid system for content */
+.content-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Card styling */
+.card {
+  background: var(--white);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+
+/* Stats cards */
+.stats-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  background: var(--white);
+  border-radius: 12px;
+  padding: 25px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}

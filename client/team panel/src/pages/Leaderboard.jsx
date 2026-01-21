@@ -37,12 +37,53 @@ const Leaderboard = () => {
     );
   }
 
+
+  const fetchLeaderboard = async () => {
+    try {
+      setLoading(true);
+      setError("");
+      const res = await fetch("http://localhost:8000/leaderboard/ppt");
+      if (!res.ok) throw new Error("Failed to load leaderboard");
+      const response = await res.json();
+      console.log("Leaderboard response:", response);
+
+      // Extract the actual data array from the response
+      // The API returns { status, data, message } format
+      const data = Array.isArray(response) ? response : (response.data || []);
+
+      // Normalize into UI structure - preserve the rank from backend
+      const mapped = data.map((item) => ({
+        id: item.team_name,
+        name: item.team_name,
+        category: item.category || "N/A",
+        round: "PPT",
+        totalScore: item.total_score,
+        averageScore: Number(item.total_score) / 4,
+        rank: item.rank, // Use rank directly from the Excel/database
+        previousRank: item.rank, // Since we're using fixed ranks, there's no change
+        qualified: item.total_score >= 70, // Just an example threshold
+        members: [],
+        project: "",
+        // Additional scoring details
+        innovationScore: item.innovation_uniqueness,
+        technicalScore: item.technical_feasibility,
+        impactScore: item.potential_impact,
+        fileName: item.file_name || "",
+      }));
+      setTeams(mapped);
+    } catch (e) {
+      setError(e.message || "Error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="lbp-container">
       {/* Header */}
       <div className="lbp-header">
         <h1 className="lbp-title">
-          Leaderboard
+          LEADERBOARD
           <span className="lbp-title-highlight" />
         </h1>
         <div className="lbp-badge">Scoring: 100 Points</div>

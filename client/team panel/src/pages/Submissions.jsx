@@ -164,10 +164,10 @@ const Submissions = () => {
               )}
               {analysis.analysisResults && (
                 <>
-                  <div>
+                  {/* <div>
                     <strong>Overall Score:</strong>{" "}
                     {analysis.analysisResults.overall_score ?? "N/A"}
-                  </div>
+                  </div> */}
                   <div>
                     <strong>Summary:</strong>{" "}
                     {analysis.analysisResults.summary ?? "N/A"}

@@ -145,7 +145,7 @@ const TeamInfo = () => {
         </div>
       </div>
 
-      {/* Team Overview Section */}
+      {/* Team Overview Section
       <div className="team-schedule-section">
         <div className="team-schedule-section-header team-schedule-gradient">
           <div className="team-schedule-section-title">
@@ -227,13 +227,13 @@ const TeamInfo = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Team Members Section */}
       <div className="team-schedule-section">
         <div className="team-schedule-section-header team-schedule-gradient">
           <div className="team-schedule-section-title">
-            <span className="team-schedule-section-number">02</span>
+            <span className="team-schedule-section-number">01</span>
             <span className="team-schedule-section-text">TEAM MEMBERS</span>
           </div>
           <div className="team-schedule-section-count">

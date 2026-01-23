@@ -24,7 +24,7 @@ const Header = () => {
   }, [location]);
 
   const menuItems = [
-    { path: "/", icon: FaHome, label: "Dashboard" },
+    { path: "/dashboard", icon: FaHome, label: "Dashboard" },
     { path: "/team", icon: FaUsers, label: "Team Info" },
     { path: "/submissions", icon: FaUpload, label: "Submissions" },
     { path: "/leaderboard", icon: FaTrophy, label: "Leaderboard" },

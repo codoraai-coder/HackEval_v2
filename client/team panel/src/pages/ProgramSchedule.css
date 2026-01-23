@@ -911,3 +911,32 @@
 .day-selector {
   display: none !important;
 }
+.event-card-header {
+  position: relative;
+}
+.event-status {
+  position: absolute;
+  top: 0.2rem;
+  right: -3rem;
+  z-index: 5;
+}
+.event-time-display {
+  padding-right: 90px; /* space for badge */
+  flex-wrap: wrap;
+}
+.status-badge {
+  white-space: nowrap;
+  min-width: 88px;
+  text-align: center;
+  border-radius: 999px;
+}
+@media (max-width: 480px) {
+  .event-status {
+    top: 0.75rem;
+    right: 0.75rem;
+  }
+
+  .event-time-display {
+    padding-right: 80px;
+  }
+}

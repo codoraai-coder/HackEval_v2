@@ -268,9 +268,7 @@ const Dashboard = () => {
         <div className="dashboard-card dashboard-team-details">
           <div className="dashboard-card-header">
             <h2>Team Details</h2>
-            <span className="dashboard-team-id">
-              ID: {dashboardData.team_id}
-            </span>
+            
           </div>
 
           <div className="dashboard-team-info-grid">

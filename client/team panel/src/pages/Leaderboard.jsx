@@ -86,7 +86,7 @@ const Leaderboard = () => {
           LEADERBOARD
           <span className="lbp-title-highlight" />
         </h1>
-        <div className="lbp-badge">Scoring: 100 Points</div>
+        
       </div>
 
       {/* Table */}
@@ -94,10 +94,7 @@ const Leaderboard = () => {
         <div className="lbp-row lbp-head">
           <div>Rank</div>
           <div>Team</div>
-          <div>Innovation</div>
-          <div>Technical</div>
-          <div>Impact</div>
-          <div>Total</div>
+          
         </div>
 
         {rows.map((r) => (
@@ -118,11 +115,7 @@ const Leaderboard = () => {
               )}
             </div>
 
-            <div>{r.innovation_uniqueness || 0}</div>
-            <div>{r.technical_feasibility || 0}</div>
-            <div>{r.potential_impact || 0}</div>
-
-            <div className="lbp-total">{r.total_score}</div>
+            
           </div>
         ))}
       </div>

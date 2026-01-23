@@ -289,7 +289,7 @@ const TeamInfo = () => {
                   <div className="team-schedule-member-info">
                     <div className="team-schedule-info-row">
                       <span className="team-schedule-info-label">Roll No:</span>
-                      <span className="team-schedule-info-value">{member.roll_no}</span>
+                      <span className="team-schedule-info-value">{member.roll_no.length > 0 ? member.roll_no : "N/A"}</span>
                     </div>
                     <div className="team-schedule-info-row">
                       <span className="team-schedule-info-label">Email:</span>

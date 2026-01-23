@@ -16,7 +16,7 @@ const ProgramSchedule = () => {
   const scheduleData = [
     {
       day: 1,
-      date: "29 December, 2025",
+      date: "22 January, 2026",
       events: [
         { 
           time: "10:00 AM", 
@@ -40,7 +40,7 @@ const ProgramSchedule = () => {
           priority: "high"
         },
         { 
-          time: "01:30 PM", 
+          time: "12:30 PM", 
           endTime: "02:30 PM", 
           desc: "Lunch Break", 
           icon: "🍽️",
@@ -64,7 +64,7 @@ const ProgramSchedule = () => {
     },
     {
       day: 2,
-      date: "30 December, 2025",
+      date: "23 January, 2026",
       events: [
         { 
           time: "12:00 AM", 
@@ -112,7 +112,7 @@ const ProgramSchedule = () => {
     },
     {
       day: 3,
-      date: "31 December, 2025",
+      date: "24 January, 2026",
       events: [
         { 
           time: "12:00 AM", 
@@ -125,7 +125,7 @@ const ProgramSchedule = () => {
           time: "02:00 AM", 
           endTime: "06:00 AM", 
           desc: "Night Challenge", 
-          icon: "🌙💻",
+          icon: "🌙",
           priority: "high"
         },
         { 
@@ -163,7 +163,7 @@ const ProgramSchedule = () => {
   const parseTime = (timeStr, dateStr) => {
     const [date, month, year] = dateStr.split(/[\s,]+/);
     const dateNum = parseInt(date);
-    const monthIndex = new Date(`${month} 1, 2025`).getMonth();
+    const monthIndex = new Date(`${month} 1, 2026`).getMonth();
     const [time, modifier] = timeStr.split(' ');
     let [hours, minutes] = time.split(':');
     
@@ -173,7 +173,7 @@ const ProgramSchedule = () => {
     if (modifier === 'PM' && hours < 12) hours += 12;
     if (modifier === 'AM' && hours === 12) hours = 0;
     
-    return new Date(2025, monthIndex, dateNum, hours, minutes);
+    return new Date(2026, monthIndex, dateNum, hours, minutes);
   };
 
   const calculateTimeRemaining = (eventTime) => {
@@ -270,9 +270,20 @@ const ProgramSchedule = () => {
     }
   }, [alarmPlaying]);
 
-  
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setNow(new Date());
+      findUpcomingEvent();
+      
+      // Pulse animation every 5 seconds
+      if (Math.floor(Date.now() / 5000) % 2 === 0) {
+        setPulseAnimation(true);
+        setTimeout(() => setPulseAnimation(false), 500);
+      }
+    }, 1000);
 
-  
+    return () => clearInterval(timer);
+  }, []);
 
   const timeRemaining = upcomingEvent ? calculateTimeRemaining(upcomingEvent.eventTime) : null;
 
@@ -390,26 +401,7 @@ const ProgramSchedule = () => {
                   </div>
                 </div>
                 
-                {/* Circular Progress Timer */}
-                <div className="circular-timer">
-                  <div className="circular-progress">
-                    <svg className="progress-ring" width="120" height="120">
-                      <circle
-                        className="progress-ring-circle"
-                        stroke="#00b4d8"
-                        strokeWidth="4"
-                        fill="transparent"
-                        r="52"
-                        cx="60"
-                        cy="60"
-                        style={{
-                          strokeDasharray: `${(timeRemaining.seconds / 60) * 326.56} 326.56`
-                        }}
-                      />
-                    </svg>
-                    <div className="circular-label">SEC</div>
-                  </div>
-                </div>
+                
               </div>
             </div>
             
@@ -477,8 +469,12 @@ const ProgramSchedule = () => {
             <div className="events-grid">
               {day.events.map((event, index) => {
                 const eventTime = parseTime(event.time, day.date);
-                const isPast = eventTime < now;
-                const isNow = !isPast && calculateTimeRemaining(eventTime).total <= 600000;
+                const eventEndTime = parseTime(event.endTime, day.date);
+
+                const isPast = now >= eventEndTime;
+                const isNow = now >= eventTime && now < eventEndTime;
+
+                // const isNow = now>eventTime && now < parseTime(event.endTime, day.date) ;
                 const eventRemaining = calculateTimeRemaining(eventTime);
                 
                 return (
@@ -502,7 +498,7 @@ const ProgramSchedule = () => {
                         {isPast ? (
                           <span className="status-badge completed">✓ COMPLETED</span>
                         ) : isNow ? (
-                          <span className="status-badge live">● LIVE SOON</span>
+                          <span className="status-badge live">● LIVE </span>
                         ) : (
                           <span className="status-badge upcoming">⏱️ UPCOMING</span>
                         )}
@@ -547,18 +543,7 @@ const ProgramSchedule = () => {
       </div>
 
       {/* Floating Action Button */}
-      <button 
-        className="fab" 
-        onClick={() => {
-          if (upcomingEvent) {
-            const time = calculateTimeRemaining(upcomingEvent.eventTime);
-            alert(`Next event: ${upcomingEvent.desc}\nStarts in: ${time.hours}h ${time.minutes}m ${time.seconds}s`);
-          }
-        }}
-      >
-        <span className="fab-icon">⏱️</span>
-        <span className="fab-text">QUICK VIEW</span>
-      </button>
+      
     </div>
   );
 };

@@ -2,36 +2,43 @@
 
 /* ROOT */
 .lbp-container {
-  padding: 2.25rem; /* Reduced 10% from 2.5rem */
+  padding: 2rem;
   min-height: 100vh;
-  margin-top: 135px; /* Reduced 10% from 150px */
-  background: linear-gradient(135deg, #ffffff, #f0f8ff);
+  margin-top: 135px;
+  background: #ffffff;
   font-family: 'Inter', sans-serif;
 }
 
 /* HEADER */
 .lbp-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
-  margin-bottom: 2.7rem; /* Reduced 10% from 3rem */
+  margin-bottom: 2rem;
 }
 
 .lbp-title {
   font-family: 'Orbitron', sans-serif;
-  font-size: 2.08rem; /* Reduced 20% from 2.6rem */
+  font-size: 2rem;
   font-weight: 800;
   color: #0066cc;
+  letter-spacing: 1px;
   position: relative;
 }
 
 .lbp-title-highlight {
   position: absolute;
-  bottom: -9.6px; /* Reduced 20% from 12px */
+  bottom: -6px;
   left: 0;
   width: 100%;
-  height: 3.2px; /* Reduced 20% from 4px */
-  background: linear-gradient(90deg, transparent, #00b4d8, #0066cc, transparent);
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #00b4d8,
+    #0066cc,
+    transparent
+  );
   animation: lbp-slide 3s linear infinite;
 }
 
@@ -40,145 +47,128 @@
   to { transform: translateX(100%); }
 }
 
-.lbp-badge {
-  padding: 0.675rem 1.8rem; /* Reduced 10% from 0.75rem 2rem */
-  border-radius: 22.5px; /* Reduced 10% from 25px */
-  background: linear-gradient(135deg, #00b4d8, #0066cc);
-  color: white;
-  font-family: 'Orbitron', sans-serif;
-  font-weight: 700;
-  box-shadow: 0 5.4px 16.2px rgba(0, 102, 204, 0.3); /* Reduced 10% from 6px 18px */
-  font-size: 0.9rem; /* Reduced 10% from base */
-}
-
 /* CARD */
 .lbp-card {
   background: white;
-  border-radius: 18px; /* Reduced 10% from 20px */
-  border: 1.8px solid #e6f2ff; /* Reduced 10% from 2px */
-  box-shadow: 0 10.8px 32.4px rgba(0, 102, 204, 0.12); /* Reduced 10% from 12px 36px */
+  border-radius: 14px;
+  border: 1px solid #e6f2ff;
+  box-shadow: 0 8px 28px rgba(0, 102, 204, 0.12);
   overflow: hidden;
 }
 
-/* ROWS */
-.lbp-row {
-  display: grid;
-  grid-template-columns: 81px 1.6fr repeat(3, 117px) 117px; /* Reduced 10% from 90px 130px */
-  padding: 1.125rem 1.35rem; /* Reduced 10% from 1.25rem 1.5rem */
-  align-items: center;
-  border-bottom: 0.9px solid #e6f2ff; /* Reduced 10% from 1px */
-}
-
+/* TABLE HEADER */
 .lbp-head {
-  background: linear-gradient(135deg, #f0f8ff, #ffffff);
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  padding: 1rem 1.5rem;
+  background: #f4f9ff;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.85rem;
   font-weight: 800;
   color: #0066cc;
-  font-family: 'Orbitron', sans-serif;
-  font-size: 0.9rem; /* Reduced 10% from base */
+  border-bottom: 2px solid #00b4d8;
 }
 
+/* ROW */
+.lbp-row {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  padding: 1rem 1.5rem;
+  align-items: center;
+  border-bottom: 1px solid #e6f2ff;
+  transition: background 0.2s ease;
+}
+
+/* Hover — NO SIDE SHIFT */
+.lbp-row:not(.lbp-head):hover {
+  background: #f8fbff;
+}
+
+/* RANK */
 .lbp-rank {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Orbitron', sans-serif;
   font-weight: 900;
   color: #0066cc;
-  font-size: 0.9rem; /* Reduced 10% from base */
+  font-size: 0.9rem;
 }
 
+.lbp-rank svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* TEAM */
 .lbp-team {
   font-weight: 700;
   color: #004080;
+  font-size: 0.95rem;
   display: flex;
   flex-direction: column;
-  font-size: 0.9rem; /* Reduced 10% from base */
 }
 
+/* YOUR TEAM */
 .lbp-you {
-  font-size: 0.675rem; /* Reduced 10% from 0.75rem */
+  margin-top: 4px;
+  font-size: 0.65rem;
+  font-weight: 600;
   color: #0066cc;
   display: flex;
-  gap: 3.6px; /* Reduced 10% from 4px */
-  margin-top: 1.8px; /* Reduced 10% from 2px */
+  align-items: center;
+  gap: 4px;
 }
 
-.lbp-total {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 1.17rem; /* Reduced 10% from 1.3rem */
-  font-weight: 900;
-  color: #0066cc;
-}
-
-/* MY TEAM */
+/* MY TEAM HIGHLIGHT */
 .lbp-myteam {
-  background: linear-gradient(135deg, #f0f8ff, #ffffff);
-  border-left: 4.5px solid #00b4d8; /* Reduced 10% from 5px */
+  background: linear-gradient(90deg, #eef7ff, #ffffff);
+  border-left: 4px solid #00b4d8;
 }
 
 /* LOADING */
 .lbp-loading {
   text-align: center;
-  font-size: 1.08rem; /* Reduced 10% from 1.2rem */
-  color: #0066cc;
   font-family: 'Orbitron', sans-serif;
+  font-size: 1rem;
+  color: #0066cc;
+  padding: 3rem;
 }
 
 /* RESPONSIVE */
-@media (max-width: 992px) {
-  .lbp-row {
-    grid-template-columns: 63px 1fr repeat(3, 81px) 81px; /* Reduced 10% from 70px 90px */
-  }
-}
-
 @media (max-width: 768px) {
   .lbp-container {
-    padding: 1.35rem; /* Reduced 10% from 1.5rem */
+    padding: 1.25rem;
+    margin-top: 0;
   }
 
-  .lbp-header {
-    flex-direction: column;
-    gap: 1.35rem; /* Reduced 10% from 1.5rem */
-    text-align: center;
-  }
-
+  .lbp-head,
   .lbp-row {
-    grid-template-columns: 54px 1fr; /* Reduced 10% from 60px */
-    row-gap: 0.675rem; /* Reduced 10% from 0.75rem */
+    grid-template-columns: 70px 1fr;
+    padding: 0.85rem 1rem;
   }
 
-  .lbp-row > div:nth-child(n+3) {
-    display: none;
+  .lbp-title {
+    font-size: 1.6rem;
+  }
+
+  .lbp-team {
+    font-size: 0.85rem;
+  }
+
+  .lbp-rank svg {
+    width: 18px;
+    height: 18px;
   }
 }
 
-@media (max-width: 768px) {
-  .lbp-container {
-    margin-top: 0px;
+@media (max-width: 480px) {
+  .lbp-head,
+  .lbp-row {
+    grid-template-columns: 60px 1fr;
   }
-}
 
-/* Additional reduction for main heading and other text */
-.lbp-title {
-  font-size: 2.08rem; /* 20% reduction already applied above */
-}
-
-.lbp-badge {
-  font-size: 0.8rem; /* Additional reduction for badge text */
-}
-
-.lbp-head {
-  font-size: 0.8rem; /* Additional reduction for header text */
-}
-
-.lbp-team {
-  font-size: 0.8rem; /* Additional reduction for team text */
-}
-
-.lbp-rank {
-  font-size: 0.8rem; /* Additional reduction for rank text */
-}
-
-.lbp-total {
-  font-size: 1.04rem; /* Additional 10% reduction on top of previous reduction */
-}
-
-.lbp-loading {
-  font-size: 0.96rem; /* Additional 10% reduction on top of previous reduction */
+  .lbp-title {
+    font-size: 1.4rem;
+  }
 }

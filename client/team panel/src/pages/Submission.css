@@ -1,0 +1,187 @@
+/* ============================= */
+/* Upload + Analysis Cards */
+/* ============================= */
+
+.submission-card,
+.analysis-card {
+  background: white;
+  border-radius: 20px;
+  padding: 2.5rem;
+  border: 2px solid #e6f2ff;
+  box-shadow: 0 8px 32px rgba(0, 102, 204, 0.12);
+  max-width: 700px;
+  margin: auto;
+}
+
+/* Description text (DO NOT REMOVE) */
+.submission-desc {
+  font-size: 1.1rem;
+  color: #004080;
+  margin-bottom: 1.25rem;
+}
+
+/* ============================= */
+/* Upload Row (FILE + BUTTON) */
+/* ============================= */
+
+.submission-upload-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1.5rem;
+  align-items: center;
+  width: 100%;
+}
+
+/* File input box */
+.file-input-box {
+  display: flex;
+  align-items: center;
+  height: 56px;
+  padding: 0 1.25rem;
+  border: 2px dashed #00b4d8;
+  border-radius: 14px;
+  background: #f8fbff;
+  font-weight: 600;
+  color: #0066cc;
+  cursor: pointer;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Upload button */
+.submission-btn {
+  height: 56px;
+  padding: 0 2rem;
+  border-radius: 28px;
+  border: none;
+  font-weight: 800;
+  background: linear-gradient(135deg, #00b4d8, #0066cc);
+  color: white;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.submission-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.submission-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 102, 204, 0.3);
+}
+
+/* ============================= */
+/* Status / Error Messages */
+/* ============================= */
+
+.submission-success {
+  margin-top: 1.5rem;
+  padding: 1rem 1.25rem;
+  border-left: 5px solid #00b4d8;
+  background: #f0f8ff;
+  font-weight: 600;
+  border-radius: 8px;
+}
+
+/* 🔥 ERROR FIX: force block + left alignment */
+.submission-error {
+  margin-top: 1.25rem;
+  padding: 1rem 1.25rem;
+  background: #fff5f5;
+  border-left: 5px solid #ef4444;
+  color: #991b1b;
+  font-weight: 600;
+  border-radius: 8px;
+
+  display: block;
+  width: 100%;
+  text-align: left;
+
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+/* ============================= */
+/* Analysis Section */
+/* ============================= */
+
+.analysis-card {
+  text-align: center;
+}
+
+.analysis-details {
+  margin-top: 2rem;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  font-size: 1.05rem;
+  color: #004080;
+}
+
+.analysis-empty {
+  margin-top: 1.5rem;
+  font-size: 1.1rem;
+  color: #666;
+}
+
+/* ============================= */
+/* Mobile */
+/* ============================= */
+
+@media (max-width: 768px) {
+  .submission-upload-row {
+    grid-template-columns: 1fr;
+  }
+
+  .submission-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+/* ============================= */
+/* Analysis Action Button */
+/* ============================= */
+
+.analysis-btn {
+  margin-top: 1rem;
+  background: linear-gradient(135deg, #00b4d8, #0066cc);
+  border: none;
+  color: white;
+  padding: 0.75rem 2rem;
+  border-radius: 28px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.analysis-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 102, 204, 0.3);
+}
+
+/* ============================= */
+/* Analysis Empty State */
+/* ============================= */
+
+.analysis-empty {
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  background: #f8fbff;
+  border: 2px dashed #cce0ff;
+  border-radius: 14px;
+  color: #0066cc;
+  font-weight: 600;
+  text-align: center;
+}

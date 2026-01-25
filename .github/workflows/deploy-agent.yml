@@ -1,0 +1,75 @@
+name: Deploy Agent to EC2
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'Hackeval_agent/**'
+      - '.github/workflows/deploy-agent.yml'
+      - 'deploy-agent.sh'
+      - 'ecosystem-agent.config.js'
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION: '3.10'
+
+jobs:
+  deploy-agent:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+          cache-dependency-path: Hackeval_agent/requirements.txt
+
+      - name: Install Python Dependencies
+        working-directory: ./Hackeval_agent
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Create deployment package
+        run: |
+          mkdir -p deploy/Hackeval_agent
+          cp -r Hackeval_agent/* deploy/Hackeval_agent/
+          cp ecosystem-agent.config.js deploy/
+          cp deploy-agent.sh deploy/
+          tar -czf deploy-agent.tar.gz deploy/
+
+      - name: Deploy to EC2
+        env:
+          PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          HOST: ${{ secrets.EC2_HOST }}
+          USER: ${{ secrets.EC2_USER }}
+        run: |
+          echo "$PRIVATE_KEY" > private_key.pem
+          chmod 600 private_key.pem
+          
+          # Copy deployment package
+          scp -i private_key.pem -o StrictHostKeyChecking=no deploy-agent.tar.gz ${USER}@${HOST}:~/
+          
+          # Execute deployment script
+          ssh -i private_key.pem -o StrictHostKeyChecking=no ${USER}@${HOST} << 'EOF'
+            cd ~
+            tar -xzf deploy-agent.tar.gz
+            cd deploy
+            chmod +x deploy-agent.sh
+            ./deploy-agent.sh
+            rm -f ~/deploy-agent.tar.gz
+          EOF
+          
+          rm -f private_key.pem
+
+      - name: Cleanup
+        if: always()
+        run: |
+          rm -f private_key.pem
+          rm -f deploy-agent.tar.gz

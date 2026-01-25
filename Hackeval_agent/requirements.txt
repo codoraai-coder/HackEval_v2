@@ -1,0 +1,15 @@
+python-dotenv
+langchain-core
+langchain-openai
+pydantic>=2.0.0
+python-pptx
+pypdf
+Pillow
+PyMuPDF
+pypdfium2 
+comtypes 
+pandas
+openpyxl
+fastapi
+uvicorn[standard]
+python-multipart

@@ -1,0 +1,217 @@
+/* ================================
+   Codora AI – Base Layout Polish
+   ================================ */
+
+.app {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f8fafc;
+}
+
+/* Main Content Area */
+.main-content {
+  flex: 1;
+  margin-left: 0;
+  /* Sidebar removed */
+  margin-top: 80px;
+  /* MUST match Header height */
+  padding: 32px 40px 80px 40px;
+  min-height: calc(100vh - 80px);
+  overflow-y: auto;
+  background: linear-gradient(180deg, #f9fafb 0%, #eef4ff 100%);
+  position: relative;
+  transition: all 0.25s ease;
+  box-sizing: border-box;
+}
+
+/* Constrain content width for professional layout */
+.main-content>* {
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* When sidebar is hidden (auth pages) */
+.main-content.sidebar-hidden {
+  margin-left: 0;
+  margin-top: 0;
+  min-height: 100vh;
+  padding: 0;
+  background: #f8fafc;
+}
+
+.main-content.sidebar-hidden>* {
+  max-width: 100%;
+  margin: 0;
+}
+
+/* ================================
+   Card System
+   ================================ */
+
+.card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.06);
+  border: 1px solid #e5e7eb;
+  transition: all 0.25s ease;
+}
+
+.card:hover {
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.10);
+  transform: translateY(-4px);
+}
+
+/* ================================
+   Footer
+   ================================ */
+
+.footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border-top: 1px solid #e5e7eb;
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+}
+
+/* ================================
+   Page Headers
+   ================================ */
+
+.page-header {
+  margin-bottom: 32px;
+}
+
+.page-title {
+  font-size: 26px;
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 6px;
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: #64748b;
+}
+
+/* ================================
+   Filter / Search Bar Containers
+   ================================ */
+
+.filter-bar {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 16px;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+}
+
+/* ================================
+   Loading State
+   ================================ */
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 240px;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.loading::after {
+  content: "";
+  width: 18px;
+  height: 18px;
+  border: 2px solid #e5e7eb;
+  border-top: 2px solid #2563eb;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-left: 10px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* ================================
+   Empty State
+   ================================ */
+
+.empty-state {
+  text-align: center;
+  padding: 48px 16px;
+  color: #64748b;
+}
+
+.empty-state h3 {
+  margin-bottom: 6px;
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.empty-state p {
+  font-size: 14px;
+  color: #64748b;
+}
+
+/* ================================
+   Buttons (Global Polish)
+   ================================ */
+
+button {
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+/* ================================
+   Responsive
+   ================================ */
+
+@media (max-width: 1024px) {
+  .main-content {
+    padding: 24px 24px 72px 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .app {
+    flex-direction: column;
+  }
+
+  .main-content {
+    margin-left: 0;
+    margin-top: 64px;
+    padding: 16px 16px 64px 16px;
+    min-height: calc(100vh - 64px);
+  }
+
+  .main-content>* {
+    max-width: 100%;
+  }
+
+  .footer {
+    font-size: 12px;
+  }
+}

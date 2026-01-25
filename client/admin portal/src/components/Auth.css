@@ -1,0 +1,208 @@
+.auth-background {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(120deg, #f9fafb 60%, #80bdfd 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-container {
+  width: 420px;
+  background: #ffffff;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.auth-logo img {
+  width: 140px;
+  margin-bottom: 15px;
+}
+
+.auth-title {
+  font-size: 26px;
+  color: #222;
+}
+
+.auth-subtitle {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 14px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 15px;
+}
+
+input:focus,
+textarea:focus {
+  border-color: #0077ff;
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 119, 255, 0.3);
+}
+
+textarea {
+  resize: none;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  background: linear-gradient(135deg, #0077ff, #005ecc);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 6px;
+}
+
+button:hover {
+  background: linear-gradient(135deg, #005ecc, #004bb5);
+}
+
+button.secondary {
+  background: #e0e0e0;
+  color: #333;
+}
+
+.error-box {
+  background: #ffe6e6;
+  color: #d8000c;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.auth-footer {
+  margin-top: 18px;
+  font-size: 14px;
+}
+
+.auth-footer a {
+  color: #0077ff;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+@media (max-width: 480px) {
+  .auth-container {
+    width: 90%;
+    padding: 25px;
+  }
+}
+.auth-container {
+  animation: fadeUp 0.7s ease forwards;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.signup-wide {
+  width: 520px;
+}
+.form-step {
+  animation: stepFade 0.4s ease;
+}
+
+@keyframes stepFade {
+  from {
+    opacity: 0;
+    transform: translateX(25px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+input,
+textarea {
+  transition: border 0.3s ease, box-shadow 0.3s ease, transform 0.15s ease;
+}
+
+input:focus,
+textarea:focus {
+  transform: scale(1.01);
+}
+button {
+  transition: all 0.25s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+}
+
+button:active {
+  transform: translateY(0);
+}
+button.secondary:hover {
+  background: #d5d5d5;
+}
+@media (max-width: 600px) {
+  .signup-wide {
+    width: 92%;
+  }
+}
+
+.step-indicator {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 10px 0 20px;
+}
+
+.step-indicator span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #d0d0d0;
+  transition: all 0.3s ease;
+}
+
+.step-indicator span.active {
+  background: #0077ff;
+  transform: scale(1.2);
+}
+.success-box {
+  background: #e6fffa;
+  color: #065f46;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.auth-footer span {
+  color: #0077ff;
+  cursor: pointer;
+  font-weight: 600;
+}

@@ -15,6 +15,9 @@ function SignIn() {
     setError("");
     setIsLoading(true);
 
+  
+
+    
     try {
       const response = await fetch("http://localhost:8000/judge/login", {
         method: "POST",
@@ -23,7 +26,7 @@ function SignIn() {
       });
 
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message);
+      if (!response.ok) throw new Error(data.message || "Invalid credentials");
 
       localStorage.setItem("judgeToken", data.data.accessToken);
       navigate("/dashboard");
@@ -38,11 +41,12 @@ function SignIn() {
     <div className="auth-background">
       <div className="auth-container">
         <div className="auth-logo">
-          <img src="../../public/images/codoraai.png" alt="Codora AI" />
+          
+          <img src="/images/codoraai.png" alt="Codora AI" />
         </div>
 
         <h1 className="auth-title">Judge Panel</h1>
-        <p className="auth-subtitle">Hackathon Evaluation Portal</p>
+        <p className="auth-subtitle">Codora AI Evaluation Platform</p>
 
         {error && <div className="error-box">{error}</div>}
 

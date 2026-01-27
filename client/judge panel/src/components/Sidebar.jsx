@@ -1,73 +1,43 @@
-import React from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
-import { 
-  Home, 
-  FileText, 
-  ClipboardList, 
-  Award,
-  GraduationCap,
-  UserPlus,
+import React from "react";
+import { NavLink } from "react-router-dom";
+import {
+  Home,
+  ClipboardList,
   Trophy,
-  X, // Import close icon
-  LogOut, // Import logout icon
+  X,
   Calendar
-} from 'lucide-react';
-import './Sidebar.css';
+} from "lucide-react";
+import "./Sidebar.css";
 
-const Sidebar = ({ isOpen, onClose }) => {
-  const navigate = useNavigate();
+const Sidebar = ({ isOpen = true, onClose }) => {
   const menuItems = [
     {
-      path: '/dashboard',
-      icon: <Home size={20} />,
-      label: 'Dashboard Home'
-    },
-    // {
-    //   path: '/evaluate',
-    //   icon: <FileText size={20} />,
-    //   label: 'Evaluate Submissions'
-    // },
-    // {
-    //   path: '/assign',
-    //   icon: <UserPlus size={20} />,
-    //   label: 'Assign'
-    // },
-   {
-      path: '/judge-schedule', // Add this new route
-      icon: <Calendar size={20} />, // Calendar icon for schedule
-      label: 'Judge Schedule'
+      path: "/dashboard",
+      icon: <Home size={18} />,
+      label: "Dashboard"
     },
     {
-      path: '/my-evaluations',
-      icon: <ClipboardList size={20} />,
-      label: 'My Evaluations'
+      path: "/judge-schedule",
+      icon: <Calendar size={18} />,
+      label: "Judge Schedule"
     },
     {
-      path: '/leaderboard',
-      icon: <Trophy size={20} />,
-      label: 'Leaderboard'
+      path: "/my-evaluations",
+      icon: <ClipboardList size={18} />,
+      label: "My Evaluations"
     },
-    // {
-    //   path: '/final-submissions',
-    //   icon: <Award size={20} />,
-    //   label: 'Final Submission List'
-    // }
+    {
+      path: "/leaderboard",
+      icon: <Trophy size={18} />,
+      label: "Leaderboard"
+    }
   ];
 
   return (
-    <aside className={`sidebar ${isOpen ? 'sidebar-open' : ''}`}>
-      <div className="sidebar-header">
-        {/* <div className="logo">
-          <GraduationCap size={32} color="#1B4332" />
-          <div className="logo-text">
-            <h2>GLA University</h2>
-            <p>Judge Portal</p>
-          </div>
-        </div> */}
-        <button className="sidebar-close" onClick={onClose}>
-          <X size={20} />
-        </button>
-      </div>
+    <aside className={`sidebar ${isOpen ? "sidebar-open" : ""}`}>
+      
+   
+
       
       <nav className="sidebar-nav">
         <ul className="nav-list">
@@ -75,8 +45,8 @@ const Sidebar = ({ isOpen, onClose }) => {
             <li key={item.path}>
               <NavLink
                 to={item.path}
-                className={({ isActive }) => 
-                  `nav-link ${isActive ? 'active' : ''}`
+                className={({ isActive }) =>
+                  `nav-link ${isActive ? "active" : ""}`
                 }
               >
                 <span className="nav-icon">{item.icon}</span>
@@ -86,20 +56,6 @@ const Sidebar = ({ isOpen, onClose }) => {
           ))}
         </ul>
       </nav>
-      
-      {/* Logout Button */}
-      {/* <div className="logout-section">
-        <button 
-          className="logout-button" 
-          onClick={() => navigate("/signin")}
-          title="Log out"
-        >
-          <LogOut size={20} />
-          <span>Logout</span>
-        </button>
-      </div> */}
-      
-      
     </aside>
   );
 };

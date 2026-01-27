@@ -10,14 +10,14 @@ const EvaluateSubmission = () => {
   const selectedTeam = location.state?.selectedTeam;
   
   const [evaluation, setEvaluation] = useState({
-    problem_solution_fit: 5,
-    functionality_features: 5,
-    technical_feasibility: 5,
-    innovation_creativity: 5,
-    user_experience: 5,
-    impact_value: 5,
-    presentation_demo_quality: 5,
-    team_collaboration: 5,
+    problem_solution_fit: 0,
+    functionality_features: 0,
+    technical_feasibility: 0,
+    innovation_creativity: 0,
+    user_experience: 0,
+    impact_value: 0,
+    presentation_demo_quality: 0,
+    team_collaboration: 0,
     personalized_feedback: ''
   });
 
@@ -44,7 +44,12 @@ const EvaluateSubmission = () => {
     };
 
     loadJudgeData();
+    // console.log("SELECTED TEAM STRUCTURE:", selectedTeam);
   }, [selectedTeam]);
+  const teamMembers = selectedTeam?.members || [];
+
+const teamLeader = teamMembers.find(member => member.isLeader);
+
 
   const loadExistingEvaluation = async (teamId) => {
     try {
@@ -90,7 +95,10 @@ const EvaluateSubmission = () => {
 
     if (response.ok) {
       const result = await response.json();
-      setPptEvaluation(result.data);
+      setPptEvaluation(result);
+      console.log("PPT Evaluation RAW API response:", result);
+    console.log("PPT Evaluation result.data:", result.data);
+    console.log("PPT Evaluation result.data.data:", result.data?.data);
     } else {
       setPptEvaluation(null);
     }
@@ -285,13 +293,13 @@ const EvaluateSubmission = () => {
 
             <div className="metadata-item">
               <h3>Team Leader</h3>
-              {selectedTeam.teamLeader ? (
+              {teamLeader ? (
                 <div className="team-leader-info">
-                  <p><strong>Name:</strong> {selectedTeam.teamLeader.name}</p>
-                  <p><strong>Roll No:</strong> {selectedTeam.teamLeader.rollNo}</p>
-                  <p><strong>Email:</strong> {selectedTeam.teamLeader.email}</p>
-                  <p><strong>Contact:</strong> {selectedTeam.teamLeader.contact}</p>
-                  <p><strong>Role:</strong> {selectedTeam.teamLeader.role}</p>
+                  <p><strong>Name:</strong> {teamLeader.name}</p>
+                  <p><strong>Roll No:</strong> {teamLeader.rollNo}</p>
+                  <p><strong>Email:</strong> {teamLeader.email}</p>
+                  <p><strong>Contact:</strong> {teamLeader.phone}</p>
+                  <p><strong>Role:</strong> Team Leader</p>
                 </div>
               ) : (
                 <p>No team leader information available</p>
@@ -300,13 +308,15 @@ const EvaluateSubmission = () => {
 
             <div className="metadata-item">
               <h3>Team Members</h3>
-              {selectedTeam.teamMembers && selectedTeam.teamMembers.length > 0 ? (
+              {teamMembers.length > 0 ? (
                 <div className="team-members-list">
-                  {selectedTeam.teamMembers.map((member, index) => (
+                  {teamMembers.map((member, index) => (
                     <div key={index} className="member-card">
                       <div className="member-header">
                         <h4>{member.name}</h4>
-                        <span className="member-role">{member.role}</span>
+                        <span className="member-role">
+                          {member.isLeader ? "Team Leader" : member.role || "Member"}
+                        </span>
                       </div>
                     </div>
                   ))}
@@ -365,7 +375,8 @@ const EvaluateSubmission = () => {
               <div className="ai-scores-section">
                 <h3>AI Evaluation Scores</h3>
                 <div className="ai-scores-grid">
-                  {Object.entries(pptEvaluation.evaluation_scores).map(([parameter, score]) => (
+                  {pptEvaluation?.evaluation_scores &&
+                    Object.entries(pptEvaluation.evaluation_scores).map(([parameter, score]) => (
                     <div key={parameter} className="ai-score-item">
                       <div className="ai-score-header">
                         <span className="ai-parameter-name">{parameter}</span>

@@ -113,9 +113,9 @@ const SignIn = () => {
             <button type="submit" className="auth-button" disabled={loading}>
               {loading ? "Signing In..." : "Sign In"}
             </button>
-            <p className="auth-link">
+            {/* <p className="auth-link">
               Don’t have a team? <a href="/signup">Register here</a>
-            </p>
+            </p> */}
 
 
             {/* <div className="demo-credentials">

@@ -5,7 +5,7 @@ const getAuthToken = () => {
   return localStorage.getItem('judgeToken');
 };
 
-// Get judge profile
+
 export const getJudgeProfile = async () => {
   try {
     const token = getAuthToken();
@@ -32,7 +32,7 @@ export const getJudgeProfile = async () => {
 export const getAllTeams = async () => {
   try {
     const token = getAuthToken();
-    const response = await fetch(`${API_BASE_URL}/judge/evaluation/teams`, {
+    const response = await fetch(`${API_BASE_URL}/judge/team-evaluation/teams`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -98,7 +98,7 @@ export const submitEvaluation = async (evaluationData) => {
   }
 };
 
-// Save draft
+
 export const saveDraft = async (evaluationData) => {
   try {
     const token = getAuthToken();

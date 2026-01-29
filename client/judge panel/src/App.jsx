@@ -1,29 +1,38 @@
+import React from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+  Navigate,
+} from "react-router-dom";
 
-import React, { useState } from "react";
-import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from "react-router-dom";
-import Sidebar from "./components/Sidebar.jsx";
 import Header from "./components/Header.jsx";
 import Dashboard from "./components/Dashboard.jsx";
 import EvaluateSubmission from "./components/EvaluateSubmission.jsx";
 import MyEvaluations from "./components/MyEvaluations.jsx";
 import SignIn from "./components/SignIn.jsx";
-import SignUp from "./components/Signup.jsx"; // Import the SignUp component
+import SignUp from "./components/Signup.jsx";
 import Assign from "./components/Assign.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
-import "./App.css";
 import Leaderboard from "./components/Leaderboard.jsx";
 import JudgeSchedule from "./components/JudgeSchedule.jsx";
 
-// Layout to hide sidebar/footer on SignIn and SignUp pages
+import "./App.css";
+
+// Layout to hide sidebar & header on auth pages
 function Layout({ children }) {
   const location = useLocation();
-  const isAuthPage = location.pathname === "/signin" || location.pathname === "/signup";
+  const isAuthPage =
+    location.pathname === "/signin" || location.pathname === "/signup";
+
   return (
     <div className="app">
       {!isAuthPage && <Header />}
-      {!isAuthPage && <Sidebar isOpen={true} />}
-      <main className="main-content">
+
+      <main className={`main-content ${isAuthPage ? "sidebar-hidden" : ""}`}>
         {children}
+
         {!isAuthPage && (
           <footer className="footer">
             © {new Date().getFullYear()} Codora AI | Judge Evaluation Portal
@@ -46,38 +55,60 @@ function App() {
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
 
-          {/* Judge Portal - Protected Routes */}
-          <Route path="/dashboard" element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          } />
-          <Route path="/leaderboard" element={
-            <ProtectedRoute>
-              <Leaderboard />
-            </ProtectedRoute>
-          } />
+          {/* Protected Judge Routes */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
 
-          <Route path="/judge-schedule" element={ // Add this route
-            <ProtectedRoute>
-              <JudgeSchedule />
-            </ProtectedRoute>
-          } />
-          <Route path="/evaluate" element={
-            <ProtectedRoute>
-              <EvaluateSubmission />
-            </ProtectedRoute>
-          } />
-          <Route path="/my-evaluations" element={
-            <ProtectedRoute>
-              <MyEvaluations />
-            </ProtectedRoute>
-          } />
-          <Route path="/assign" element={
-            <ProtectedRoute>
-              <Assign />
-            </ProtectedRoute>
-          } />
+          <Route
+            path="/leaderboard"
+            element={
+              <ProtectedRoute>
+                <Leaderboard />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/judge-schedule"
+            element={
+              <ProtectedRoute>
+                <JudgeSchedule />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/evaluate"
+            element={
+              <ProtectedRoute>
+                <EvaluateSubmission />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/my-evaluations"
+            element={
+              <ProtectedRoute>
+                <MyEvaluations />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/assign"
+            element={
+              <ProtectedRoute>
+                <Assign />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </Layout>
     </Router>

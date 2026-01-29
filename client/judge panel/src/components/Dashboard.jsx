@@ -1,411 +1,269 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Users, 
-  CheckCircle, 
+import React, { useState, useEffect, useRef } from "react";
+import {
+  Users,
+  CheckCircle,
   Clock,
-  TrendingUp,
-  Award,
   Search,
-  Filter,
-  ChevronLeft,
-  ChevronRight,
   Play,
-  RefreshCw
-} from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import './Dashboard.css';
+  RefreshCw,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import "./Dashboard.css";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
 const Dashboard = () => {
-  const [judgeName, setJudgeName] = useState('Judge');
-  const [isLoading, setIsLoading] = useState(true);
+  const [judgeName, setJudgeName] = useState("Judge");
   const [teams, setTeams] = useState([]);
   const [teamsLoading, setTeamsLoading] = useState(true);
   const [activeRound, setActiveRound] = useState(null);
   const [evaluatedCount, setEvaluatedCount] = useState(0);
   const [pendingCount, setPendingCount] = useState(0);
-  const [statsLoading, setStatsLoading] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
   const [judgeId, setJudgeId] = useState(null);
 
-  
-  // Filtering and pagination states
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [teamsPerPage] = useState(6);
+
+  // Refresh state
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const [showSearch, setShowSearch] = useState(false);
+  const searchRef = useRef(null);
 
   const navigate = useNavigate();
 
-  // Get auth token
-  const getAuthToken = () => {
-    return localStorage.getItem('judgeToken');
+  // Live clock effect
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const getAuthToken = () => localStorage.getItem("judgeToken");
+
+  const fetchData = async (showLoading = true) => {
+    if (showLoading) setIsRefreshing(true);
+
+    try {
+      const token = getAuthToken();
+      if (!token) return;
+
+      // Parallel fetch
+      const [profileRes, teamsRes] = await Promise.all([
+        fetch(`${API_BASE_URL}/judge/current`, { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(`${API_BASE_URL}/judge/evaluation/teams`, { headers: { Authorization: `Bearer ${token}` } })
+      ]);
+
+      if (profileRes.ok) {
+        const data = await profileRes.json();
+        setJudgeName(data.data?.name || data.data?.username || "Judge");
+        setJudgeId(data.data?._id);
+      }
+
+      if (teamsRes.ok) {
+        const data = await teamsRes.json();
+        setTeams(data.data || []);
+      }
+    } catch (err) {
+      console.error("Error refreshing data:", err);
+    } finally {
+      if (showLoading) setIsRefreshing(false);
+      setTeamsLoading(false);
+    }
   };
 
   useEffect(() => {
-    const fetchJudgeProfile = async () => {
-      try {
-        const token = getAuthToken();
-        if (!token) {
-          setJudgeName('Judge');
-          return;
-        }
-        
-        const response = await fetch(`${API_BASE_URL}/judge/current`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        // console.log(response);
-        
-        if (response.ok) {
-          const data = await response.json();
-          if (data.data && data.data.name) {
-            setJudgeName(data.data.name);
-          } else if (data.data && data.data.username) {
-            setJudgeName(data.data.username);
-          }
-        }
-      } catch (error) {
-        console.error('Failed to fetch judge profile:', error);
-        // Fallback to username from localStorage if available
-        const storedUsername = localStorage.getItem('judgeUsername');
-        if (storedUsername) {
-          setJudgeName(storedUsername);
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    const fetchTeams = async () => {
-      try {
-        const token = getAuthToken();
-        const response = await fetch(`${API_BASE_URL}/judge/evaluation/teams`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        
-        
-        
-        if (response.ok) {
-          const data = await response.json();
-          console.log(data);
-          setTeams(data.data || []);
-        } else {
-          console.error('Failed to fetch teams');
-          setTeams([]);
-        }
-      } catch (error) {
-        console.error('Failed to fetch teams:', error);
-        setTeams([]);
-      } finally {
-        setTeamsLoading(false);
-      }
-    };
-
-    // Fetch teams and judge profile
-    fetchTeams();
-    fetchJudgeProfile();
+    fetchData(false); // Initial load without spinner on button
   }, []);
 
-  // Update evaluation stats when teams are loaded
+  const handleRefresh = () => {
+    fetchData(true);
+  };
+
   useEffect(() => {
-    if (teams.length > 0) {
-      updateEvaluationStats();
-    }
-  }, [teams]);
-
-  // Fetch current round and keep it updated
-  useEffect(() => {
-    let mounted = true;
-    let timerId;
-    
-    const fetchActive = async () => {
-      try {
-        const res = await fetch(`${API_BASE_URL}/round-state/active`);
-        if (!res.ok) return;
-        const data = await res.json();
-        if (!mounted) return;
-        setActiveRound(data.round);
-      } catch {}
-    };
-    
-    fetchActive();
-    timerId = setInterval(fetchActive, 5000);
-    
-    return () => { 
-      mounted = false; 
-      if (timerId) clearInterval(timerId); 
-    };
-  }, []);
-
-  // Filter teams based on search term and category
-  const filteredTeams = teams.filter(team => {
-    const matchesSearch = team.teamName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         team.projectTitle?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || 
-                           team.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
-
-  // const filteredTeams = teams
-  // // 🔒 SHOW ONLY TEAMS ASSIGNED TO CURRENT JUDGE
-  // .filter(team => team.assignedJudgeId === judgeId)
-  // .filter(team => {
-  //   const matchesSearch =
-  //     team.teamName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //     team.projectTitle?.toLowerCase().includes(searchTerm.toLowerCase());
-
-  //   const matchesCategory =
-  //     selectedCategory === 'all' || team.category === selectedCategory;
-
-  //   return matchesSearch && matchesCategory;
-  // });
-
-
-  // Get unique categories for filter dropdown
-  const categories = ['all', ...Array.from(new Set(teams.map(team => team.category).filter(Boolean)))];
-
-  // Pagination logic
-  const indexOfLastTeam = currentPage * teamsPerPage;
-  const indexOfFirstTeam = indexOfLastTeam - teamsPerPage;
-  const currentTeams = filteredTeams.slice(indexOfFirstTeam, indexOfLastTeam);
-  const totalPages = Math.ceil(filteredTeams.length / teamsPerPage);
-
-  // Reset to first page when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, selectedCategory]);
-
-  // Update evaluation stats
-  const updateEvaluationStats = () => {
-    const evaluated = teams.filter(team => team.evaluationStatus === 'completed').length;
-    const pending = teams.filter(team => 
-      team.evaluationStatus === 'assigned' || team.evaluationStatus === 'in-progress'
+    const evaluated = teams.filter(
+      (t) => t.evaluationStatus === "completed"
     ).length;
-    
+    const pending = teams.filter(
+      (t) =>
+        t.evaluationStatus === "assigned" ||
+        t.evaluationStatus === "in-progress"
+    ).length;
     setEvaluatedCount(evaluated);
     setPendingCount(pending);
-  };
+  }, [teams]);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        setShowSearch(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const [selectedCategory, setSelectedCategory] = useState("All");
+
+  const filteredTeams =
+  
+  teams.filter((team) => {
+    const isAssignedToJudge =
+    !judgeId || team.assignedJudge?._id === judgeId;
+    const matchesSearch =
+      team.teamName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      team.projectTitle?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    // Check various possible locations for category data
+    const teamCategory = team.problemStatement?.category || team.category || "General";
+    const matchesCategory = selectedCategory === "All" || teamCategory === selectedCategory;
+
+    return isAssignedToJudge && matchesSearch && matchesCategory;
+  });
 
   const handleTeamSelect = (team) => {
-    navigate('/evaluate', { 
-      state: { selectedTeam: team } 
-    });
+    navigate("/evaluate", { state: { selectedTeam: team } });
   };
-
-  const refreshEvaluationStats = () => {
-    updateEvaluationStats();
-  };
-
-  const stats = [
-    {
-      title: 'Total Teams',
-      value: teamsLoading ? '...' : teams.length.toString(),
-      icon: <Users size={24} />,
-      color: 'blue',
-      subtitle: 'Available for evaluation'
-    },
-    {
-      title: 'Evaluated',
-      value: evaluatedCount.toString(),
-      icon: <CheckCircle size={24} />,
-      color: 'green',
-      subtitle: 'Completed evaluations'
-    },
-    {
-      title: 'Pending Review',
-      value: pendingCount.toString(),
-      icon: <Clock size={24} />,
-      color: 'orange',
-      subtitle: 'Awaiting evaluation'
-    }
-  ];
 
   return (
     <div className="dashboard">
-      <div className="page-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-        <div>
-          <h1 className="page-title">Welcome back, {judgeName}</h1>
-          <p className="page-subtitle">Here's your evaluation overview.</p>
+      {/* Hero Section with Clock */}
+      <div className="dashboard-hero">
+        <div className="hero-left">
+          <h1 className="hero-title">Welcome back, {judgeName}</h1>
+          <p className="hero-subtitle">Here's your evaluation overview.</p>
+          <div className="hero-actions">
+            <button
+              className="btn btn-secondary refresh-btn"
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+            >
+              <RefreshCw size={16} className={isRefreshing ? "spin" : ""} />
+              <span className="btn-text">{isRefreshing ? "Refreshing..." : "Refresh"}</span>
+            </button>
+            <div className="current-round-badge">
+              Round: {activeRound || "1"}
+            </div>
+          </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <button 
-            className="btn btn-secondary" 
-            onClick={refreshEvaluationStats}
-            disabled={statsLoading}
-            style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 12px' }}
-            title="Refresh evaluation statistics"
-          >
-            <RefreshCw size={16} />
-            Refresh Stats
-          </button>
-          <div className="current-round">
-            Current Round: {activeRound ? `Round ${activeRound}` : 'None'}
+
+        <div className="hero-clock">
+          <div className="clock-label">CURRENT TIME</div>
+          <div className="clock-time">
+            {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+          </div>
+          <div className="clock-date">
+            {currentTime.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
           </div>
         </div>
       </div>
 
-      {/* Statistics Cards */}
+      {/* Stats */}
       <div className="stats-grid">
-        {stats.map((stat, index) => (
-          <div key={index} className={`stat-card stat-${stat.color}`}>
-            <div className="stat-icon">
-              {stat.icon}
-            </div>
-            <div className="stat-content">
-              <h3 className="stat-value">{stat.value}</h3>
-              <p className="stat-title">{stat.title}</p>
-              {stat.subtitle && <p className="stat-subtitle">{stat.subtitle}</p>}
-            </div>
+        <div className="stat-card">
+          <div className="stat-title">Total Teams</div>
+          <div className="stat-value">{teams.length}</div>
+          <div className="stat-icon">
+            <Users size={22} />
           </div>
-        ))}
+        </div>
+
+        <div className="stat-card">
+          <div className="stat-title">Evaluated</div>
+          <div className="stat-value">{evaluatedCount}</div>
+          <div className="stat-icon">
+            <CheckCircle size={22} />
+          </div>
+        </div>
+
+        <div className="stat-card">
+          <div className="stat-title">Pending Review</div>
+          <div className="stat-value">{pendingCount}</div>
+          <div className="stat-icon">
+            <Clock size={22} />
+          </div>
+        </div>
       </div>
 
-      <div className="dashboard-content">
-        {/* Teams List */}
-        <div className="dashboard-section">
-          <div className="section-header">
-            <h2>Assigned Teams</h2>
-            <div className="section-actions">
-              <div className="search-filter-container">
-                {/* Search Bar */}
-                <div className="search-container">
-                  <Search size={18} className="search-icon" />
+      {/* Teams */}
+      <div className="dashboard-section">
+        <div className="section-header">
+          <h2>Assigned Teams</h2>
+
+          <div className="section-controls">
+            <select
+              className="category-select"
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+            >
+              <option value="All">All Categories</option>
+              <option value="Web Development">Web Development</option>
+              <option value="AI/ML">AI/ML</option>
+              <option value="Mobile App">Mobile App</option>
+              <option value="Blockchain">Blockchain</option>
+              <option value="Cloud">Cloud</option>
+              <option value="IoT">IoT</option>
+              <option value="Cybersecurity">Cybersecurity</option>
+              <option value="Social Impact">Social Impact</option>
+              <option value="Other">Other</option>
+            </select>
+
+            <div className="dashboard-search-area" ref={searchRef}>
+              <button
+                className="search-icon-btn"
+                onClick={() => setShowSearch(!showSearch)}
+              >
+                <Search size={18} />
+              </button>
+
+              {showSearch && (
+                <div className="floating-search-box">
+                  <Search size={16} />
                   <input
                     type="text"
-                    placeholder="Search teams or project titles..."
+                    placeholder="Search teams..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="search-input"
+                    autoFocus
                   />
                 </div>
-                
-                {/* Category Filter */}
-                <div className="filter-container">
-                  <Filter size={18} className="filter-icon" />
-                  <select
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="category-filter"
-                  >
-                    {categories.map(category => (
-                      <option key={category} value={category}>
-                        {category === 'all' ? 'All Categories' : category}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Results Summary */}
-          <div className="results-summary">
-            <span className="results-count">
-              Showing {filteredTeams.length} of {teams.length} teams
-            </span>
-            {searchTerm && (
-              <span className="search-term">
-                for "{searchTerm}"
-              </span>
-            )}
-            {selectedCategory !== 'all' && (
-              <span className="category-term">
-                in {selectedCategory}
-              </span>
-            )}
-          </div>
-
-          {teamsLoading ? (
-            <div className="loading">Loading teams...</div>
-          ) : filteredTeams.length === 0 ? (
-            <div className="no-results">
-              <div className="no-results-icon">🔍</div>
-              <h3>No teams found</h3>
-              <p>Try adjusting your search or filter criteria</p>
-            </div>
-          ) : (
-            <>
-              <div className="teams-list">
-                {currentTeams.map((team) => (
-                  <div key={team._id} className="team-item">
-                    <div className="team-info">
-                      <h4>{team.teamName}</h4>
-                      {/* <p className="team-category">Category: {team.category || 'N/A'}</p> */}
-                      <p className="team-project">Project: {team.projectTitle || 'Not specified'}</p>
-                      <p className="team-members-count">
-                        Members: {team.members ? team.members.length : 0}
-                      </p>
-                      <div className="evaluation-status">
-                        Status: <span className={`status-${team.evaluationStatus}`}>
-                          {team.evaluationStatus || 'unassigned'}
-                        </span>
-                      </div>
-                      {team.evaluationScore && (
-                        <p className="team-score">
-                          Score: {team.evaluationScore}/100
-                        </p>
-                      )}
-                    </div>
-                    <div className="team-actions">
-                      <button 
-                        className="btn btn-primary btn-sm"
-                        onClick={() => handleTeamSelect(team)}
-                        title="Evaluate This Team"
-                        disabled={team.evaluationStatus === 'completed'}
-                      >
-                        <Play size={16} />
-                        {team.evaluationStatus === 'completed' ? 'Evaluated' : 'Evaluate'}
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Pagination Controls */}
-              {totalPages > 1 && (
-                <div className="pagination">
-                  <button
-                    className="pagination-btn"
-                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                    disabled={currentPage === 1}
-                  >
-                    <ChevronLeft size={16} />
-                    Previous
-                  </button>
-                  
-                  <div className="page-numbers">
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                      <button
-                        key={page}
-                        className={`page-btn ${page === currentPage ? 'active' : ''}`}
-                        onClick={() => setCurrentPage(page)}
-                      >
-                        {page}
-                      </button>
-                    ))}
-                  </div>
-                  
-                  <button
-                    className="pagination-btn"
-                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                    disabled={currentPage === totalPages}
-                  >
-                    Next
-                    <ChevronRight size={16} />
-                  </button>
-                </div>
               )}
-            </>
-          )}
+            </div>
+          </div>
         </div>
+
+        {teamsLoading ? (
+          <div className="loading">Loading teams...</div>
+        ) : (
+          <div className="teams-list">
+            {filteredTeams.map((team) => (
+              <div key={team._id} className="team-item">
+                <h4>{team.teamName}</h4>
+                <div className="team-details">
+                  <p className="detail-row">
+                    <span className="detail-label">Project:</span>
+                    <span className="detail-value">{team.projectTitle || "Not specified"}</span>
+                  </p>
+                  <p className="detail-row">
+                    <span className="detail-label">Members:</span>
+                    <span className="detail-value">{team.members?.length || 0}</span>
+                  </p>
+                </div>
+
+                <button
+                  className="btn btn-primary"
+                  onClick={() => handleTeamSelect(team)}
+                >
+                  <Play size={14} />
+                  Evaluate
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

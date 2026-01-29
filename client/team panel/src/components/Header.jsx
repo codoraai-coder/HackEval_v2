@@ -24,7 +24,7 @@ const Header = () => {
   }, [location]);
 
   const menuItems = [
-    { path: "/", icon: FaHome, label: "Dashboard" },
+    { path: "/dashboard", icon: FaHome, label: "Dashboard" },
     { path: "/team", icon: FaUsers, label: "Team Info" },
     { path: "/submissions", icon: FaUpload, label: "Submissions" },
     { path: "/leaderboard", icon: FaTrophy, label: "Leaderboard" },
@@ -52,7 +52,7 @@ const Header = () => {
                 className="logo-image"
               />
             </div>
-            <h1 className="admin-title">Team Dashboard</h1>
+            {/* <h1 className="admin-title">Team Dashboard</h1> */}
           </div>
 
           <div className="admin-header-right">
@@ -61,10 +61,10 @@ const Header = () => {
               <span className="round-value">{currentRound}</span>
             </div>
 
-            <div className="notification-icon">
+            {/* <div className="notification-icon">
               <FaBell />
               <span className="notification-badge">1</span>
-            </div>
+            </div> */}
 
             <button onClick={handleLogout} className="logout-button">
               <FaUser className="user-icon" />

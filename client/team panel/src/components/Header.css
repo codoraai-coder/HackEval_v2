@@ -294,12 +294,12 @@
 }
 
 /* Focus states for accessibility */
-.nav-tab:focus,
+/* .nav-tab:focus,
 .logout-button:focus,
 .notification-icon:focus {
   outline: 2px solid #3b82f6;
   outline-offset: 2px;
-}
+} */
 
 /* Active state animation */
 .nav-tab.active::after {
@@ -312,6 +312,7 @@
   background-color: #3b82f6;
   animation: slideIn 0.3s ease-out;
 }
+
 
 @keyframes slideIn {
   from {

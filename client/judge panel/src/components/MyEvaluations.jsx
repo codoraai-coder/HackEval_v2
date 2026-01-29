@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Search, Eye, Calendar, Star, Loader2 } from "lucide-react";
 import {
   getMyEvaluations,
   debugApiConfig,
   testApiConnection,
-  isAuthenticated
+  isAuthenticated,
 } from "../utils/api";
 import "./MyEvaluations.css";
 
@@ -21,9 +21,11 @@ const MyEvaluations = () => {
     try {
       setLoading(true);
       setError(null);
+
       const raw = await getMyEvaluations();
       const list = Array.isArray(raw) ? raw : raw.data || [];
-      const transformed = list.map(doc => ({
+
+      const transformed = list.map((doc) => ({
         id: doc._id,
         teamName: doc.team_name,
         projectName: doc.problem_statement,
@@ -37,7 +39,7 @@ const MyEvaluations = () => {
           ux: doc.user_experience,
           impact: doc.impact_value,
           presentation: doc.presentation_demo_quality,
-          collaboration: doc.team_collaboration
+          collaboration: doc.team_collaboration,
         },
         totalScore: doc.total_score,
         averageScore: doc.average_score,
@@ -45,40 +47,16 @@ const MyEvaluations = () => {
         judgeName: doc.judge_name,
         status: doc.status,
         createdAt: new Date(doc.createdAt).toLocaleDateString(),
-        updatedAt: new Date(doc.updatedAt).toLocaleDateString()
+        updatedAt: new Date(doc.updatedAt).toLocaleDateString(),
       }));
+
       setEvaluations(transformed);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Failed to load evaluations");
     } finally {
       setLoading(false);
     }
   };
-
-  const openDetails = ev => {
-    setSelectedEvaluation(ev);
-    setIsDetailsOpen(true);
-  };
-  const closeDetails = () => {
-    setIsDetailsOpen(false);
-    setSelectedEvaluation(null);
-  };
-
-  const changeStatus = async (evId, newStatus) => {
-  try {
-    const updated = await updateEvaluationStatus(evId, newStatus);
-    // Update local state array
-    setEvaluations(prev =>
-      prev.map(ev =>
-        ev.id === evId
-          ? { ...ev, status: updated.status, totalScore: updated.total_score }
-          : ev
-      )
-    );
-  } catch (err) {
-    console.error("Failed to update status:", err);
-  }
-};
 
   useEffect(() => {
     if (!isAuthenticated()) {
@@ -86,8 +64,9 @@ const MyEvaluations = () => {
       setLoading(false);
       return;
     }
+
     debugApiConfig();
-    testApiConnection().then(ok => {
+    testApiConnection().then((ok) => {
       if (ok) fetchEvaluations();
       else {
         setError("Cannot connect to API");
@@ -96,7 +75,17 @@ const MyEvaluations = () => {
     });
   }, []);
 
-  const filtered = evaluations.filter(ev => {
+  const openDetails = (ev) => {
+    setSelectedEvaluation(ev);
+    setIsDetailsOpen(true);
+  };
+
+  const closeDetails = () => {
+    setIsDetailsOpen(false);
+    setSelectedEvaluation(null);
+  };
+
+  const filtered = evaluations.filter((ev) => {
     const searchMatch =
       ev.teamName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       ev.projectName.toLowerCase().includes(searchTerm.toLowerCase());
@@ -130,97 +119,114 @@ const MyEvaluations = () => {
 
   return (
     <div className="my-evaluations">
-      <div className="page-header">
-        <div className="header-content">
-          <div>
-            <h1 className="page-title">My Evaluations</h1>
-            <p className="page-subtitle">Review your completed evaluations</p>
+      {/* Header */}
+      {/* Hero Section (Matched to Dashboard) */}
+      <div className="dashboard-hero">
+        <div className="hero-left">
+          <h1 className="hero-title">My Evaluations</h1>
+          <p className="hero-subtitle">Review your completed evaluations.</p>
+          <div className="hero-actions">
+            <button
+              className="btn btn-secondary refresh-btn"
+              onClick={fetchEvaluations}
+              disabled={loading}
+            >
+              <Loader2 size={16} className={loading ? "spin" : ""} />
+              <span className="btn-text">
+                {loading ? "Refreshing..." : "Refresh"}
+              </span>
+            </button>
           </div>
-          <button
-            className="btn-primary"
-            onClick={fetchEvaluations}
-            disabled={loading}
-          >
-            {loading ? (
-              <Loader2 size={16} className="loading-spinner" />
-            ) : null}
-            {loading ? "Loading..." : "Refresh"}
-          </button>
         </div>
+
+        {/* Optional: Add a visual graphic or keep it clean on the right? 
+            Dashboard has a clock. We can leave the right side empty or add a stats summary later.
+            For now, visual parity means keeping the same container styles. 
+        */}
       </div>
 
-      <div className="filters-section card">
+      {/* Filters Toolbar */}
+      <div className="filters-section">
         <div className="filters-row">
-          <div className="search-box">
-            <Search size={20} className="search-icon" />
-            <input
-              className="search-input"
-              placeholder="Search by team name or project..."
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-            />
-          </div>
           <div className="filter-controls">
             <select
               className="filter-select"
               value={filterStatus}
-              onChange={e => setFilterStatus(e.target.value)}
+              onChange={(e) => setFilterStatus(e.target.value)}
             >
               <option value="all">All Status</option>
               <option value="draft">Draft</option>
               <option value="submitted">Submitted</option>
             </select>
           </div>
+
+          <div className="dashboard-search-area">
+            <div className="search-input-wrapper">
+              <Search className="search-input-icon" size={20} />
+              <input
+                type="text"
+                className="search-full-input"
+                placeholder="Search evaluations..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
         </div>
       </div>
 
+      {/* Cards */}
       <div className="evaluations-grid">
-        {filtered.map(ev => (
+        {filtered.map((ev) => (
           <div key={ev.id} className="evaluation-card card">
-            <div className="evaluation-header">
-              <div className="evaluation-meta">
+            <div className="card-header-row">
+              <div className="header-left">
                 <h3>{ev.teamName}</h3>
-                <p className="project-name">{ev.projectName}</p>
-                <div className="evaluation-dates">
-                  <span className="date-item">
-                    <Calendar size={14} />
-                    {ev.createdAt}
-                  </span>
-                  <span className="date-item">
-                    <Calendar size={14} />
-                    {ev.updatedAt}
-                  </span>
-                </div>
-              </div>
-              <div className="evaluation-score">
-                <div
-                  className={`score-badge score-${
-                    ev.totalScore >= 6 ? (ev.totalScore >= 8 ? "success" : "warning") : "error"
-                  }`}
-                >
-                  <Star size={16} />
-                  {ev.totalScore}
-                </div>
-                <div
-                  className={`status-badge status-${
-                    ev.status === "submitted"
-                      ? "success"
-                      : ev.status === "draft"
-                      ? "warning"
-                      : "info"
-                  }`}
-                >
+                <div className={`status-pill status-${ev.status}`}>
                   {ev.status}
                 </div>
               </div>
+
+              {/* Score Badge - Right Aligned */}
+              {ev.status !== "draft" && (
+                <div className={`score-badge score-${ev.totalScore >= 6
+                  ? ev.totalScore >= 8 ? "success" : "warning"
+                  : "error"
+                  }`}>
+                  <Star size={14} fill="currentColor" />
+                  <span>{ev.totalScore}</span>
+                </div>
+              )}
             </div>
-            <div className="evaluation-content">
-              <div className="recommendation">
-                <strong>Feedback:</strong> {ev.feedback}
+
+            <div className="card-body">
+              <div className="info-group">
+                <label>Project</label>
+                <p className="project-text">{ev.projectName || "Not specified"}</p>
               </div>
+
+              <div className="info-grid-2">
+                <div className="info-group">
+                  <label>Submitted</label>
+                  <p className="date-text">
+                    <Calendar size={12} /> {ev.updatedAt}
+                  </p>
+                </div>
+              </div>
+
+              {ev.feedback && (
+                <div className="feedback-section">
+                  <label>Feedback</label>
+                  <p className="feedback-text">"{ev.feedback}"</p>
+                </div>
+              )}
             </div>
-            <div className="evaluation-actions">
-              <button className="btn-primary" onClick={() => openDetails(ev)}>
+
+            <div className="card-footer">
+              <button
+                className="btn-view-details"
+                onClick={() => openDetails(ev)}
+              >
                 <Eye size={16} /> View Details
               </button>
             </div>
@@ -235,15 +241,20 @@ const MyEvaluations = () => {
         </div>
       )}
 
+      {/* Details Modal */}
       {isDetailsOpen && selectedEvaluation && (
         <div className="modal-overlay" onClick={closeDetails}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
+          <div
+            className="modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="modal-header">
               <h2>{selectedEvaluation.teamName} Details</h2>
               <button className="modal-close" onClick={closeDetails}>
                 ×
               </button>
             </div>
+
             <div className="metadata-content">
               <div className="metadata-item">
                 <h3>Problem–Solution Fit</h3>
@@ -279,7 +290,9 @@ const MyEvaluations = () => {
               </div>
               <div className="metadata-item">
                 <h3>Feedback</h3>
-                <p className="abstract">{selectedEvaluation.feedback}</p>
+                <p className="abstract">
+                  {selectedEvaluation.feedback}
+                </p>
               </div>
             </div>
           </div>

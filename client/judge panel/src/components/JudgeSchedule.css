@@ -32,7 +32,7 @@
 }
 
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: var(--font-body);
   background: linear-gradient(135deg, #f5f9ff 0%, #e3f2fd 100%);
   min-height: 100vh;
   color: var(--gray-dark);
@@ -51,6 +51,7 @@ body {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -62,10 +63,12 @@ body {
     transform: scale(1);
     box-shadow: 0 0 0 0 rgba(26, 115, 232, 0.4);
   }
+
   70% {
     transform: scale(1.05);
     box-shadow: 0 0 0 10px rgba(26, 115, 232, 0);
   }
+
   100% {
     transform: scale(1);
     box-shadow: 0 0 0 0 rgba(26, 115, 232, 0);
@@ -77,6 +80,7 @@ body {
     transform: scale(0.8);
     opacity: 0.8;
   }
+
   100% {
     transform: scale(1.5);
     opacity: 0;
@@ -84,8 +88,15 @@ body {
 }
 
 @keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
 }
 
 @keyframes slideInUp {
@@ -93,6 +104,7 @@ body {
     transform: translateY(20px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
@@ -100,29 +112,53 @@ body {
 }
 
 @keyframes countdownPulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 @keyframes countdownDigit {
-  0% { transform: translateY(0); opacity: 1; }
-  50% { transform: translateY(-5px); opacity: 0.5; }
-  100% { transform: translateY(0); opacity: 1; }
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  50% {
+    transform: translateY(-5px);
+    opacity: 0.5;
+  }
+
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 @keyframes progressFill {
-  from { width: 0; }
-  to { width: 100%; }
+  from {
+    width: 0;
+  }
+
+  to {
+    width: 100%;
+  }
 }
 
 /* Header Styles */
 .schedule-header {
   background: var(--white);
-  border-radius: 20px;
-  box-shadow: 0 8px 30px var(--shadow-light);
-  margin-bottom: 30px;
-  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 20px;
+  padding: 20px;
   animation: slideInUp 0.5s ease-out;
   border: 1px solid var(--light-blue);
 }
@@ -142,7 +178,8 @@ body {
 
 .schedule-header h1 {
   color: var(--primary-blue-dark);
-  font-size: 2.8rem;
+  font-size: 2.2rem;
+  font-weight: 600;
   margin-bottom: 10px;
   background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
   -webkit-background-clip: text;
@@ -209,7 +246,7 @@ body {
 .time-value {
   font-size: 2.2rem;
   font-weight: bold;
-  font-family: 'Courier New', monospace;
+  font-family: var(--font-mono);
   margin-bottom: 5px;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
@@ -283,7 +320,7 @@ body {
 }
 
 .countdown-value {
-  font-family: 'Courier New', monospace;
+  font-family: var(--font-mono);
   font-weight: bold;
   color: var(--primary-blue);
   background: var(--white);
@@ -350,7 +387,7 @@ body {
   padding: 5px 12px;
   border-radius: 20px;
   font-size: 0.9rem;
-  font-family: 'Courier New', monospace;
+  font-family: var(--font-mono);
   margin-left: 10px;
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
@@ -399,11 +436,11 @@ body {
 }
 
 .event-icon {
-  font-size: 3.5rem;
+  font-size: 2.5rem;
   background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
-  padding: 20px;
-  border-radius: 15px;
-  border: 3px solid var(--white);
+  padding: 15px;
+  border-radius: 12px;
+  border: 2px solid var(--white);
   box-shadow: 0 4px 20px var(--shadow-medium);
   color: var(--white);
 }
@@ -497,8 +534,13 @@ body {
 }
 
 @keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 .countdown-section .countdown-label {
@@ -607,11 +649,11 @@ body {
 
 .day-tab {
   flex: 1;
-  min-width: 280px;
-  padding: 25px;
+  min-width: 200px;
+  padding: 15px;
   background: var(--white);
-  border: 3px solid var(--gray);
-  border-radius: 15px;
+  border: 2px solid var(--gray);
+  border-radius: 12px;
   cursor: pointer;
   transition: all 0.4s ease;
   text-align: left;
@@ -620,8 +662,8 @@ body {
 }
 
 .day-tab:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 30px var(--shadow-light);
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px var(--shadow-light);
   border-color: var(--primary-blue-light);
 }
 
@@ -669,7 +711,7 @@ body {
 }
 
 .day-number {
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   font-weight: bold;
   color: var(--primary-blue-dark);
 }
@@ -950,10 +992,11 @@ body {
   animation: fadeIn 0.5s ease-out;
 }
 
-.event-item.live .event-content{
+.event-item.live .event-content {
   animation: pulse 2s ease-in-out infinite;
 }
- .time-dot.live-dot {
+
+.time-dot.live-dot {
   animation: pulse-ring 1.5s infinite;
 }
 
@@ -1221,7 +1264,7 @@ body {
   margin-bottom: 20px;
 }
 
-.event-details > div {
+.event-details>div {
   margin-bottom: 12px;
   display: flex;
   align-items: flex-start;
@@ -1240,32 +1283,37 @@ body {
   min-width: 120px;
 }
 
-.location-icon, .notes-icon {
+.location-icon,
+.notes-icon {
   opacity: 0.8;
   font-size: 1.1rem;
   min-width: 20px;
 }
 
-.teams-section, .criteria-section {
+.teams-section,
+.criteria-section {
   display: block;
   margin-top: 20px;
 }
 
-.teams-section strong, .criteria-section strong {
+.teams-section strong,
+.criteria-section strong {
   display: block;
   margin-bottom: 10px;
   color: var(--primary-blue-dark);
   font-weight: 600;
 }
 
-.team-tags, .criteria-tags {
+.team-tags,
+.criteria-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 10px;
 }
 
-.team-tag, .criteria-tag {
+.team-tag,
+.criteria-tag {
   padding: 8px 16px;
   background: var(--white);
   border-radius: 20px;
@@ -1275,7 +1323,8 @@ body {
   color: var(--gray-dark);
 }
 
-.team-tag:hover, .criteria-tag:hover {
+.team-tag:hover,
+.criteria-tag:hover {
   transform: translateY(-3px);
   box-shadow: 0 4px 12px var(--shadow-light);
   border-color: var(--primary-blue-light);
@@ -1495,15 +1544,15 @@ body {
   .schedule-header h1 {
     font-size: 2.4rem;
   }
-  
+
   .countdown-section {
     min-width: 100%;
   }
-  
+
   .time-unit.large {
     min-width: 80px;
   }
-  
+
   .time-value {
     font-size: 2.5rem;
   }
@@ -1586,7 +1635,9 @@ body {
     gap: 15px;
   }
 
-  .time-start, .time-end, .time-duration {
+  .time-start,
+  .time-end,
+  .time-duration {
     margin: 0;
   }
 
@@ -1636,7 +1687,8 @@ body {
     gap: 5px;
   }
 
-  .day-title, .day-theme-title {
+  .day-title,
+  .day-theme-title {
     font-size: 1.5rem;
   }
 

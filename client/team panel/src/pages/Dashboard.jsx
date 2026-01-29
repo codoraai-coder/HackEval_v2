@@ -1,133 +1,135 @@
 import React, { useContext, useEffect, useState } from "react";
 import { TeamContext } from "../context/TeamContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../config";
 import "./Dashboard.css";
 
 const Dashboard = () => {
   const { team } = useContext(TeamContext);
+  const navigate = useNavigate();
+
   const [dashboardData, setDashboardData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const token = localStorage.getItem("token");
-  const [activeRound, setActiveRound] = useState(null);
   const [stats, setStats] = useState({
     totalMembers: 0,
     projectStatus: "Not Submitted",
-    nextDeadline: "N/A"
+    nextDeadline: "N/A",
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [activeRound, setActiveRound] = useState(null);
+
+  const token = localStorage.getItem("token");
+
+  /* -------------------- HELPERS -------------------- */
+
+  const isRawTeam = (t) =>
+    t && t._id && Array.isArray(t.members);
 
   const mapTeamToDashboard = (teamDoc) => {
-    if (!teamDoc) return null;
-
-    const leader = Array.isArray(teamDoc.members)
-      ? teamDoc.members.find((m) => m.isLeader)
-      : null;
-
-    const memberNames = Array.isArray(teamDoc.members)
-      ? teamDoc.members.filter((m) => !m.isLeader).map((m) => m.name)
-      : [];
-
-    // Calculate stats
-    const totalMembers = memberNames.length + (leader ? 1 : 0);
-    const projectStatus = teamDoc.projectSubmitted ? "Submitted" : "In Progress";
-    const nextDeadline = teamDoc.nextDeadline || "N/A";
-
-    setStats({
-      totalMembers,
-      projectStatus,
-      nextDeadline
-    });
+    const leader = teamDoc.members.find((m) => m.isLeader);
+    const members = teamDoc.members.filter((m) => !m.isLeader);
 
     return {
-      team_name: teamDoc.teamName || "",
-      team_id: teamDoc._id || "",
-      category: teamDoc.category || "N/A",
-      subcategory: teamDoc.subcategory || "",
-      university_roll_no: teamDoc.universityRollNo || "",
-      problem_statement_id: teamDoc.problemStatement?.ps_id || "",
-      statement: teamDoc.problemStatement?.description || teamDoc.projectDescription || "",
-      project_submitted: teamDoc.projectSubmitted || false,
-      
-      team_leader: leader ? {
-        name: leader.name || "",
-        roll_no: leader.rollNo || "",
-        email: leader.email || "",
-        contact: leader.phone || "",
-      } : null,
-
-      members: memberNames,
+      dashboard: {
+        team_name: teamDoc.teamName || "",
+        team_id: teamDoc._id || "",
+        category: teamDoc.category || "N/A",
+        problem_statement_id: teamDoc.problemStatement?.title || "",
+        statement:
+          teamDoc.problemStatement?.description ||
+          teamDoc.projectDescription ||
+          "",
+        project_submitted: !!teamDoc.projectSubmitted,
+        team_leader: leader
+          ? {
+              name: leader.name || "",
+              roll_no: leader.rollNo || "",
+              email: leader.email || "",
+              contact: leader.phone || "",
+            }
+          : null,
+        members: members.map((m) => m.name),
+      },
+      stats: {
+        totalMembers: teamDoc.members.length,
+        projectStatus: teamDoc.projectSubmitted ? "Submitted" : "In Progress",
+        nextDeadline: teamDoc.nextDeadline || "N/A",
+      },
     };
   };
 
+  const applyTeam = (rawTeam) => {
+    const mapped = mapTeamToDashboard(rawTeam);
+    setDashboardData(mapped.dashboard);
+    setStats(mapped.stats);
+    setLoading(false);
+  };
+
+  /* -------------------- DATA LOADING -------------------- */
+
   useEffect(() => {
-    async function fetchTeam() {
+    const loadTeam = async () => {
       try {
-        if (team) {
-          setDashboardData(mapTeamToDashboard(team));
-          setLoading(false);
+        // 1️⃣ Context (RAW only)
+        if (isRawTeam(team)) {
+          applyTeam(team);
           return;
         }
 
-        const teamFromStorage = localStorage.getItem("team");
-        let parsedTeam = null;
-        if (teamFromStorage) {
+        // 2️⃣ localStorage (RAW only)
+        const stored = localStorage.getItem("team");
+        if (stored) {
           try {
-            parsedTeam = JSON.parse(teamFromStorage);
-          } catch {
-            parsedTeam = null;
-          }
-        }
-
-        if (token) {
-          try {
-            const res = await fetch(`${API_BASE_URL}/team/team`, {
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-            });
-            const payload = await res.json();
-
-            if (!res.ok || !payload?.success) {
-              throw new Error(payload?.message || "Failed to fetch team");
-            }
-
-            const backendTeam = payload.data;
-            setDashboardData(mapTeamToDashboard(backendTeam));
-            setError("");
-          } catch (err) {
-            if (parsedTeam) {
-              setDashboardData(mapTeamToDashboard(parsedTeam));
-              setError("");
+            const parsed = JSON.parse(stored);
+            if (isRawTeam(parsed)) {
+              applyTeam(parsed);
+              return;
             } else {
-              setError(err.message || "Failed to fetch team data from backend.");
-              setDashboardData(null);
+              localStorage.removeItem("team");
             }
-          } finally {
-            setLoading(false);
+          } catch {
+            localStorage.removeItem("team");
           }
-        } else if (parsedTeam) {
-          setDashboardData(mapTeamToDashboard(parsedTeam));
-          setLoading(false);
-        } else {
-          setError("No authenticated session found. Please sign in.");
-          setDashboardData(null);
-          setLoading(false);
         }
-      } catch {
-        setError("Unexpected error while loading dashboard.");
-        setDashboardData(null);
+
+        // 3️⃣ Backend
+        if (!token) {
+          throw new Error("No authenticated session found. Please sign in.");
+        }
+
+        const res = await fetch(`${API_BASE_URL}/team/team`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const payload = await res.json();
+        if (!res.ok || !payload?.success) {
+          throw new Error(payload?.message || "Failed to fetch team");
+        }
+
+        const backendTeam = payload.data;
+        if (!isRawTeam(backendTeam)) {
+          throw new Error("Invalid team data received");
+        }
+
+        localStorage.setItem("team", JSON.stringify(backendTeam));
+        applyTeam(backendTeam);
+      } catch (err) {
+        setError(err.message || "Failed to load dashboard");
         setLoading(false);
       }
-    }
+    };
 
-    fetchTeam();
+    loadTeam();
   }, [team, token]);
+
+  /* -------------------- ROUND POLLING -------------------- */
 
   useEffect(() => {
     let mounted = true;
+
     const tick = async () => {
       try {
         const r = await fetch(`${API_BASE_URL}/round-state/active`);
@@ -136,6 +138,7 @@ const Dashboard = () => {
         if (mounted) setActiveRound(d.round);
       } catch {}
     };
+
     tick();
     const id = setInterval(tick, 5000);
     return () => {
@@ -143,6 +146,8 @@ const Dashboard = () => {
       clearInterval(id);
     };
   }, []);
+
+  /* -------------------- UI STATES -------------------- */
 
   if (loading) {
     return (
@@ -158,9 +163,7 @@ const Dashboard = () => {
 
   const Shell = ({ children }) => (
     <div className="dashboard-page">
-      <div className="dashboard-container">
-        {children}
-      </div>
+      <div className="dashboard-container">{children}</div>
     </div>
   );
 
@@ -198,12 +201,14 @@ const Dashboard = () => {
     );
   }
 
+  /* -------------------- RENDER (UNCHANGED UI) -------------------- */
+
   return (
     <Shell>
       {/* Header Section */}
       <div className="dashboard-header">
         <div className="dashboard-title">
-          Team Dashboard
+          TEAM DASHBOARD
           <span className="dashboard-title-highlight"></span>
         </div>
         <div className="dashboard-round-card">
@@ -214,70 +219,74 @@ const Dashboard = () => {
         </div>
       </div>
 
-
       {/* Stats Overview */}
       <div className="dashboard-stats-grid">
         <div className="dashboard-stat-card">
           <div className="dashboard-stat-icon">👥</div>
           <div className="dashboard-stat-content">
             <h3>Team Size</h3>
-            <p className="dashboard-stat-value">{stats.totalMembers} Members</p>
+            <p className="dashboard-stat-value">
+              {stats.totalMembers} Members
+            </p>
           </div>
         </div>
+
         <div className="dashboard-stat-card">
           <div className="dashboard-stat-icon">📋</div>
           <div className="dashboard-stat-content">
             <h3>Problem Statement</h3>
-            <p className="dashboard-stat-value">{dashboardData.problem_statement_id || "N/A"}</p>
+            <p className="dashboard-stat-value">
+              {dashboardData.problem_statement_id || "N/A"}
+            </p>
           </div>
         </div>
+
         <div className="dashboard-stat-card">
           <div className="dashboard-stat-icon">🎯</div>
           <div className="dashboard-stat-content">
             <h3>Category</h3>
-            <p className="dashboard-stat-value">{dashboardData.category}</p>
+            <p className="dashboard-stat-value">
+              {dashboardData.category}
+            </p>
           </div>
         </div>
+
         <div className="dashboard-stat-card">
           <div className="dashboard-stat-icon">⏰</div>
           <div className="dashboard-stat-content">
             <h3>Next Deadline</h3>
-            <p className="dashboard-stat-value">{stats.nextDeadline}</p>
+            <p className="dashboard-stat-value">
+              {stats.nextDeadline}
+            </p>
           </div>
         </div>
       </div>
 
       {/* Main Content Grid */}
       <div className="dashboard-main-grid">
-        {/* Team Details Section */}
+        {/* Team Details */}
         <div className="dashboard-card dashboard-team-details">
           <div className="dashboard-card-header">
             <h2>Team Details</h2>
-            <span className="dashboard-team-id">ID: {dashboardData.team_id}</span>
+            
           </div>
-          
+
           <div className="dashboard-team-info-grid">
             <div className="dashboard-info-item">
               <label>Team Name</label>
-              <p className="dashboard-info-value">{dashboardData.team_name}</p>
+              <p className="dashboard-info-value">
+                {dashboardData.team_name}
+              </p>
             </div>
+
             <div className="dashboard-info-item">
               <label>Category</label>
-              <p className="dashboard-info-value">{dashboardData.category}</p>
-            </div>
-            {dashboardData.subcategory && (
-              <div className="dashboard-info-item">
-                <label>Subcategory</label>
-                <p className="dashboard-info-value">{dashboardData.subcategory}</p>
-              </div>
-            )}
-            <div className="dashboard-info-item">
-              <label>University Roll No</label>
-              <p className="dashboard-info-value">{dashboardData.university_roll_no || "N/A"}</p>
+              <p className="dashboard-info-value">
+                {dashboardData.category}
+              </p>
             </div>
           </div>
 
-          {/* Team Leader */}
           {dashboardData.team_leader && (
             <div className="dashboard-leader-section">
               <h3>Team Leader</h3>
@@ -290,35 +299,34 @@ const Dashboard = () => {
                   <div className="dashboard-leader-details">
                     <div className="dashboard-detail-item">
                       <span className="dashboard-detail-label">Email</span>
-                      <span className="dashboard-detail-value">{dashboardData.team_leader.email}</span>
+                      <span className="dashboard-detail-value">
+                        {dashboardData.team_leader.email}
+                      </span>
                     </div>
                     <div className="dashboard-detail-item">
                       <span className="dashboard-detail-label">Contact</span>
-                      <span className="dashboard-detail-value">{dashboardData.team_leader.contact}</span>
+                      <span className="dashboard-detail-value">
+                        {dashboardData.team_leader.contact}
+                      </span>
                     </div>
-                    {dashboardData.team_leader.roll_no && (
-                      <div className="dashboard-detail-item">
-                        <span className="dashboard-detail-label">Roll No</span>
-                        <span className="dashboard-detail-value">{dashboardData.team_leader.roll_no}</span>
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Team Members */}
-          {dashboardData.members?.length > 0 && (
+          {dashboardData.members.length > 0 && (
             <div className="dashboard-members-section">
-              <h3>Team Members ({dashboardData.members.length})</h3>
+              <h3>
+                Team Members ({dashboardData.members.length})
+              </h3>
               <div className="dashboard-members-list">
-                {dashboardData.members.map((member, index) => (
-                  <div key={index} className="dashboard-member-item">
+                {dashboardData.members.map((m, i) => (
+                  <div key={i} className="dashboard-member-item">
                     <div className="dashboard-member-avatar">
-                      {member.charAt(0)}
+                      {m.charAt(0)}
                     </div>
-                    <span className="dashboard-member-name">{member}</span>
+                    <span className="dashboard-member-name">{m}</span>
                   </div>
                 ))}
               </div>
@@ -330,32 +338,36 @@ const Dashboard = () => {
         <div className="dashboard-card dashboard-project-section">
           <div className="dashboard-card-header">
             <h2>Project Details</h2>
-            <span className={`dashboard-status-badge ${dashboardData.project_submitted ? 'submitted' : 'pending'}`}>
-              {dashboardData.project_submitted ? 'Submitted' : 'Pending'}
+            <span
+              className={`dashboard-status-badge ${
+                dashboardData.project_submitted
+                  ? "submitted"
+                  : "pending"
+              }`}
+            >
+              {dashboardData.project_submitted
+                ? "Submitted"
+                : "Pending"}
             </span>
           </div>
 
           <div className="dashboard-project-content">
             <div className="dashboard-problem-statement-section">
-              <h3>Problem Statement</h3>
-              <div className="dashboard-statement-id">
-                <span className="dashboard-id-label">ID:</span>
-                <span className="dashboard-id-value">{dashboardData.problem_statement_id || "Not Assigned"}</span>
-              </div>
+              <h3>Problem Description</h3>
               <div className="dashboard-statement-content">
-                <p>{dashboardData.statement || "No problem statement assigned yet."}</p>
+                <p>
+                  {dashboardData.statement ||
+                    "No problem statement assigned yet."}
+                </p>
               </div>
             </div>
 
             <div className="dashboard-project-actions">
-              <button className="dashboard-action-btn primary">
-                View Full Statement
-              </button>
-              <button className="dashboard-action-btn secondary">
+              <button
+                className="dashboard-action-btn secondary"
+                onClick={() => navigate("/submissions")}
+              >
                 Submit Project
-              </button>
-              <button className="dashboard-action-btn outline">
-                Download Resources
               </button>
             </div>
           </div>

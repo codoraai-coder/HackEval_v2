@@ -269,16 +269,19 @@ const FinalSubmissionList = () => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          zIndex: 1000
+          zIndex: 1000,
+          overflow: 'auto'
         }}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{
             background: 'white',
             borderRadius: '12px',
             padding: '32px',
             maxWidth: '800px',
+            width: '90%',
             maxHeight: '90vh',
             overflow: 'auto',
-            position: 'relative'
+            position: 'relative',
+            margin: 'auto'
           }}>
             <button
               onClick={() => setSelectedSubmission(null)}

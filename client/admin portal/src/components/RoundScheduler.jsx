@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import './RoundScheduler.css';
-import { 
-  Plus, 
-  Calendar, 
-  Clock, 
-  Upload, 
-  Edit, 
+import {
+  Plus,
+  Calendar,
+  Clock,
+  Upload,
+  Edit,
   Trash2,
   Eye,
   Loader,
@@ -34,12 +34,12 @@ const RoundScheduler = () => {
     try {
       setLoading(true);
       const token = getAuthToken();
-      
+
       if (!token) {
         setError('Authentication required. Please log in again.');
         return;
       }
-      
+
       const response = await fetch(`${API_BASE_URL}/admin/rounds`, {
         method: 'GET',
         headers: {
@@ -47,17 +47,17 @@ const RoundScheduler = () => {
           'Authorization': `Bearer ${token}`
         }
       });
-      
+
       if (response.status === 401) {
         setError('Authentication required. Please log in again.');
         return;
       }
-      
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.message || `Failed to fetch rounds: ${response.status}`);
       }
-      
+
       const data = await response.json();
       // Use data.data which contains the array of rounds from ApiResponse
       setRounds(data.data || []);
@@ -80,7 +80,7 @@ const RoundScheduler = () => {
     } else {
       setSuccess(message);
     }
-    
+
     setTimeout(() => {
       if (type === 'error') {
         setError(null);
@@ -122,9 +122,9 @@ const RoundScheduler = () => {
   const handleDeleteRound = async (roundId) => {
     const round = rounds.find((r) => r._id === roundId);
     const name = round ? round.name : 'this round';
-    
+
     if (!window.confirm(`Delete ${name}? This action cannot be undone.`)) return;
-    
+
     try {
       const token = getAuthToken();
       const response = await fetch(`${API_BASE_URL}/admin/rounds/${roundId}`, {
@@ -134,17 +134,17 @@ const RoundScheduler = () => {
           'Authorization': `Bearer ${token}`
         }
       });
-      
+
       if (response.status === 401) {
         showMessage('Authentication required. Please log in again.');
         return;
       }
-      
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.message || `Failed to delete round: ${response.status}`);
       }
-      
+
       await fetchRounds();
       showMessage('Round deleted successfully!', 'success');
     } catch (err) {
@@ -153,15 +153,46 @@ const RoundScheduler = () => {
     }
   };
 
+  // Quick status update without opening modal
+  const handleUpdateStatus = async (roundId, newStatus) => {
+    try {
+      const token = getAuthToken();
+      const response = await fetch(`${API_BASE_URL}/admin/rounds/${roundId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ status: newStatus })
+      });
+
+      if (response.status === 401) {
+        showMessage('Authentication required. Please log in again.');
+        return;
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Failed to update status: ${response.status}`);
+      }
+
+      await fetchRounds();
+      showMessage(`Status updated to ${newStatus}!`, 'success');
+    } catch (err) {
+      showMessage(`Failed to update status: ${err.message}`);
+      console.error('Error updating status:', err);
+    }
+  };
+
   const handleSaveRound = async (roundData) => {
     try {
       const token = getAuthToken();
-      const url = selectedRound 
+      const url = selectedRound
         ? `${API_BASE_URL}/admin/rounds/${selectedRound._id}`
         : `${API_BASE_URL}/admin/rounds`;
-        
+
       const method = selectedRound ? 'PUT' : 'POST';
-      
+
       const response = await fetch(url, {
         method,
         headers: {
@@ -170,12 +201,12 @@ const RoundScheduler = () => {
         },
         body: JSON.stringify(roundData),
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.message || `Failed to save round: ${response.status}`);
       }
-      
+
       await fetchRounds();
       setShowModal(false);
       setSelectedRound(null);
@@ -212,21 +243,21 @@ const RoundScheduler = () => {
         <div className="alert alert-error">
           <AlertCircle size={20} />
           <span>{error}</span>
-          <button 
-            onClick={() => setError(null)} 
+          <button
+            onClick={() => setError(null)}
             className="alert-close"
           >
             ×
           </button>
         </div>
       )}
-      
+
       {success && (
         <div className="alert alert-success">
           <CheckCircle size={20} />
           <span>{success}</span>
-          <button 
-            onClick={() => setSuccess(null)} 
+          <button
+            onClick={() => setSuccess(null)}
             className="alert-close"
           >
             ×
@@ -236,7 +267,7 @@ const RoundScheduler = () => {
 
       <div className="action-bar">
         <div className="view-controls">
-          <button 
+          <button
             className={`btn ${viewMode === 'list' ? 'btn-primary' : 'btn-secondary'}`}
             onClick={() => setViewMode('list')}
           >
@@ -275,7 +306,7 @@ const RoundScheduler = () => {
                       {getStatusBadge(round.status)}
                     </div>
                   </div>
-                  
+
                   <div className="round-details">
                     <div className="detail-item">
                       <Clock size={16} />
@@ -292,14 +323,30 @@ const RoundScheduler = () => {
                   </div>
 
                   <div className="round-actions">
-                    <button 
+                    <select
+                      className="form-select status-select"
+                      value={round.status}
+                      onChange={(e) => handleUpdateStatus(round._id, e.target.value)}
+                      style={{
+                        padding: '8px 12px',
+                        borderRadius: '6px',
+                        border: '1px solid #d1d5db',
+                        marginRight: '8px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <option value="draft">Draft</option>
+                      <option value="live">Live</option>
+                      <option value="completed">Completed</option>
+                    </select>
+                    <button
                       className="btn btn-secondary"
                       onClick={() => handleEditRound(round)}
                     >
                       <Edit size={16} /> Edit
                     </button>
-                    <button 
-                      className="btn btn-error" 
+                    <button
+                      className="btn btn-error"
                       onClick={() => handleDeleteRound(round._id)}
                     >
                       <Trash2 size={16} /> Delete
@@ -322,7 +369,7 @@ const RoundScheduler = () => {
 
       {/* Add/Edit Round Modal */}
       {showModal && (
-        <RoundModal 
+        <RoundModal
           round={selectedRound}
           onClose={() => {
             setShowModal(false);
@@ -351,33 +398,33 @@ const RoundModal = ({ round, onClose, onSave }) => {
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.name.trim()) newErrors.name = 'Round name is required';
     if (!formData.description.trim()) newErrors.description = 'Description is required';
     if (!formData.startTime) newErrors.startTime = 'Start time is required';
     if (!formData.endTime) newErrors.endTime = 'End time is required';
     if (!formData.uploadDeadline) newErrors.uploadDeadline = 'Upload deadline is required';
-    
+
     if (new Date(formData.endTime) <= new Date(formData.startTime)) {
       newErrors.endTime = 'End time must be after start time';
     }
-    
-    if (new Date(formData.uploadDeadline) < new Date(formData.startTime) || 
-        new Date(formData.uploadDeadline) > new Date(formData.endTime)) {
+
+    if (new Date(formData.uploadDeadline) < new Date(formData.startTime) ||
+      new Date(formData.uploadDeadline) > new Date(formData.endTime)) {
       newErrors.uploadDeadline = 'Upload deadline must be between start and end time';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
-    
+
     setSaving(true);
-    
+
     try {
       // Convert datetime strings to proper format
       const submitData = {
@@ -386,7 +433,7 @@ const RoundModal = ({ round, onClose, onSave }) => {
         endTime: new Date(formData.endTime).toISOString(),
         uploadDeadline: new Date(formData.uploadDeadline).toISOString()
       };
-      
+
       await onSave(submitData);
     } catch (err) {
       console.error('Error in form submission:', err);
@@ -401,7 +448,7 @@ const RoundModal = ({ round, onClose, onSave }) => {
       ...prev,
       [name]: value
     }));
-    
+
     // Clear error when field is edited
     if (errors[name]) {
       setErrors(prev => ({
@@ -418,7 +465,7 @@ const RoundModal = ({ round, onClose, onSave }) => {
           <h2 className="modal-title">{round ? 'Edit Round' : 'Add New Round'}</h2>
           <button className="modal-close" onClick={onClose}>×</button>
         </div>
-        
+
         <form onSubmit={handleSubmit}>
           <div className="modal-body">
             <div className="form-group">
@@ -433,7 +480,7 @@ const RoundModal = ({ round, onClose, onSave }) => {
               />
               {errors.name && <span className="error-text">{errors.name}</span>}
             </div>
-            
+
             <div className="form-group">
               <label className="form-label">Description</label>
               <textarea
@@ -446,7 +493,7 @@ const RoundModal = ({ round, onClose, onSave }) => {
               />
               {errors.description && <span className="error-text">{errors.description}</span>}
             </div>
-            
+
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label">Start Time</label>
@@ -473,7 +520,7 @@ const RoundModal = ({ round, onClose, onSave }) => {
                 {errors.endTime && <span className="error-text">{errors.endTime}</span>}
               </div>
             </div>
-            
+
             <div className="form-group">
               <label className="form-label">Upload Deadline</label>
               <input
@@ -486,7 +533,7 @@ const RoundModal = ({ round, onClose, onSave }) => {
               />
               {errors.uploadDeadline && <span className="error-text">{errors.uploadDeadline}</span>}
             </div>
-            
+
             <div className="form-group">
               <label className="form-label">Status</label>
               <select
@@ -503,16 +550,16 @@ const RoundModal = ({ round, onClose, onSave }) => {
           </div>
 
           <div className="modal-footer">
-            <button 
-              type="button" 
-              className="btn btn-secondary" 
+            <button
+              type="button"
+              className="btn btn-secondary"
               onClick={onClose}
               disabled={saving}
             >
               Cancel
             </button>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="btn btn-primary"
               disabled={saving}
             >

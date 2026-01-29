@@ -15,7 +15,7 @@ import Dashboard from "./pages/Dashboard.jsx";
 import TeamInfo from "./pages/TeamInfo.jsx";
 import Submissions from "./pages/Submissions.jsx";
 import Leaderboard from "./pages/Leaderboard.jsx";
-import Mentors from "./pages/Mentors.jsx";
+// import Mentors from "./pages/Mentors.jsx"; // COMMENTED OUT - Mentor feature disabled
 import Analytics from "./pages/Analytics.jsx";
 import Notifications from "./pages/Notifications.jsx";
 import ProfileSettings from "./pages/Auth/ProfileSettings.jsx";
@@ -84,6 +84,7 @@ function AppLayout() {
               </PrivateRoute>
             }
           />
+          {/* COMMENTED OUT - Mentor feature disabled
           <Route
             path="/mentors"
             element={
@@ -92,6 +93,7 @@ function AppLayout() {
               </PrivateRoute>
             }
           />
+          */}
           <Route
             path="/analytics"
             element={

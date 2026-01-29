@@ -475,11 +475,13 @@ label[for="file-upload"]:hover svg {
 }
 
 .table-container {
+    max-height: 500px;
+    overflow-y: auto;
+    overflow-x: auto;
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(20px);
     border-radius: 1.5rem;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    overflow: hidden;
     box-shadow: var(--shadow-light);
     position: relative;
 }

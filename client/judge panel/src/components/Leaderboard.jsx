@@ -14,7 +14,7 @@ const Leaderboard = () => {
     const fetchLeaderboard = async () => {
       try {
         const token = localStorage.getItem("judgeToken");
-        const res = await fetch(`${API_BASE_URL}/leaderboard`, {
+        const res = await fetch(`${API_BASE_URL}/leaderboard/ppt`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -74,7 +74,7 @@ const Leaderboard = () => {
               <tr>
                 <th className="col-rank">Rank</th>
                 <th className="col-team">Team</th>
-                <th className="col-score">Total Score</th>
+                {/* <th className="col-score">Total Score</th> */}
               </tr>
             </thead>
             <tbody>
@@ -92,14 +92,10 @@ const Leaderboard = () => {
                     </td>
                     <td className="col-team">
                       <div className="team-cell">
-                        <span className="team-name">{team.teamName}</span>
+                        <span className="team-name">{team.team_name}</span>
                       </div>
                     </td>
-                    <td className="col-score">
-                      <div className="score-cell">
-                        <span className="score-value">{team.totalScore || 0}</span>
-                      </div>
-                    </td>
+                    
                   </tr>
                 );
               })}

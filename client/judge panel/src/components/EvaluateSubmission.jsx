@@ -95,10 +95,7 @@ const teamLeader = teamMembers.find(member => member.isLeader);
 
     if (response.ok) {
       const result = await response.json();
-      setPptEvaluation(result);
-      console.log("PPT Evaluation RAW API response:", result);
-    console.log("PPT Evaluation result.data:", result.data);
-    console.log("PPT Evaluation result.data.data:", result.data?.data);
+      setPptEvaluation(result.data.data);
     } else {
       setPptEvaluation(null);
     }

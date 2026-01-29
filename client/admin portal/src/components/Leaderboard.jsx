@@ -35,6 +35,9 @@ const Leaderboard = () => {
   const [uploadError, setUploadError] = useState("");
   const [uploadSuccess, setUploadSuccess] = useState("");
 
+  // Publish confirmation modal state
+  const [showPublishModal, setShowPublishModal] = useState(false);
+
   useEffect(() => {
     fetchLeaderboard();
   }, []);
@@ -61,7 +64,7 @@ const Leaderboard = () => {
         averageScore: Number(item.total_score) / 4,
         rank: item.rank, // Use rank directly from the Excel/database
         previousRank: item.rank, // Since we're using fixed ranks, there's no change
-        qualified: item.total_score >= 70, // Just an example threshold
+        // qualified: item.total_score >= 70, // Just an example threshold - COMMENTED OUT
         members: [],
         project: "",
         // Additional scoring details
@@ -80,6 +83,10 @@ const Leaderboard = () => {
 
   const categories = [
     "all",
+    "Smart Cities",
+    "Healthcare",
+    "Data Science",
+    "Sustainability",
     "AI/ML",
     "Web Development",
     "Mobile App",
@@ -146,9 +153,27 @@ const Leaderboard = () => {
   };
 
   const handlePublishLeaderboard = () => {
-    setIsPublished(true);
-    // Publish functionality would be implemented here
-    console.log("Publishing leaderboard...");
+    setShowPublishModal(true);
+  };
+
+  const confirmPublish = async () => {
+    try {
+      // TODO: Call backend API to publish leaderboard
+      // const res = await fetch('http://localhost:8000/admin/leaderboard/publish', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ round: 'PPT', published: true })
+      // });
+      setIsPublished(true);
+      setShowPublishModal(false);
+      console.log("Leaderboard published successfully!");
+    } catch (error) {
+      console.error("Error publishing leaderboard:", error);
+    }
+  };
+
+  const cancelPublish = () => {
+    setShowPublishModal(false);
   };
 
   const handleExportLeaderboard = () => {
@@ -207,7 +232,7 @@ const Leaderboard = () => {
   };
 
   const calculateStats = () => {
-    const qualifiedTeams = teams.filter((t) => t.qualified);
+    // const qualifiedTeams = teams.filter((t) => t.qualified); // COMMENTED OUT
     const avgScore =
       teams.length > 0
         ? teams.reduce((sum, t) => sum + t.averageScore, 0) / teams.length
@@ -215,7 +240,7 @@ const Leaderboard = () => {
 
     return {
       totalTeams: teams.length,
-      qualifiedTeams: qualifiedTeams.length,
+      // qualifiedTeams: qualifiedTeams.length, // COMMENTED OUT
       averageScore: avgScore.toFixed(2),
       topScore:
         teams.length > 0 ? Math.max(...teams.map((t) => t.averageScore)) : 0,
@@ -254,6 +279,7 @@ const Leaderboard = () => {
             </div>
           </div>
 
+          {/* COMMENTED OUT - Qualified Teams Card
           <div className="dashboard-card">
             <div className="card-header">
               <div
@@ -272,6 +298,7 @@ const Leaderboard = () => {
               <span className="change positive">+{stats.qualifiedTeams}</span>
             </div>
           </div>
+          */}
 
           <div className="dashboard-card">
             <div className="card-header">
@@ -514,81 +541,81 @@ const Leaderboard = () => {
         </div>
       </div>
 
-      {/* Leaderboard Table */}
-      <div className="card">
-        <div className="card-header">
-          <h3>
-            {viewMode === "overall"
-              ? "Overall Leaderboard"
-              : "Category-wise Rankings"}
-            {isPublished && <span className="published-badge">Published</span>}
-          </h3>
-        </div>
-        <div className="card-body">
-          {loading && <div className="info">Loading...</div>}
-          {error && <div className="error">{error}</div>}
-          <div className="table-container">
-            <table className="table leaderboard-table">
-              <thead>
-                <tr>
-                  <th>Rank</th>
-                  <th>Team</th>
-                  <th>Category</th>
-                  <th>Innovation</th>
-                  <th>Feasibility</th>
-                  <th>Impact</th>
-                  <th>Total Score</th>
-                  <th>File</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {displayedTeams.length > 0 ? (
-                  displayedTeams.map((team) => (
-                    <tr
-                      key={team.id}
-                      className={team.rank <= 3 ? "top-team" : ""}
-                    >
-                      <td>
-                        <div className="rank-cell">
-                          {getRankIcon(team.rank)}
-                          {/* No rank change display since ranks are fixed from Excel */}
-                        </div>
-                      </td>
-                      <td>
-                        <div className="team-info">
-                          <strong>{team.name}</strong>
-                        </div>
-                      </td>
-                      <td>
-                        <span className="category-badge">{team.category}</span>
-                      </td>
-                      <td>
-                        <span className="criteria-score">
-                          {team.innovationScore}/10
-                        </span>
-                      </td>
-                      <td>
-                        <span className="criteria-score">
-                          {team.technicalScore}/10
-                        </span>
-                      </td>
-                      <td>
-                        <span className="criteria-score">
-                          {team.impactScore}/10
-                        </span>
-                      </td>
-                      <td>
-                        <span className="total-score">{team.totalScore}</span>
-                      </td>
-                      <td>
-                        <span className="file-name" title={team.fileName}>
-                          {team.fileName
-                            ? team.fileName.substring(0, 15) + "..."
-                            : "N/A"}
-                        </span>
-                      </td>
+      {/* Leaderboard Table - Only show in Overall mode */}
+      {viewMode === "overall" && (
+        <div className="card">
+          <div className="card-header">
+            <h3>
+              Overall Leaderboard
+              {isPublished && <span className="published-badge">Published</span>}
+            </h3>
+          </div>
+          <div className="card-body">
+            {loading && <div className="info">Loading...</div>}
+            {error && <div className="error">{error}</div>}
+            <div className="table-container">
+              <table className="table leaderboard-table">
+                <thead>
+                  <tr>
+                    <th>Rank</th>
+                    <th>Team</th>
+                    <th>Category</th>
+                    <th>Innovation</th>
+                    <th>Feasibility</th>
+                    <th>Impact</th>
+                    <th>Total Score</th>
+                    <th>File</th>
+                    {/* <th>Status</th> */}
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {displayedTeams.length > 0 ? (
+                    displayedTeams.map((team) => (
+                      <tr
+                        key={team.id}
+                        className={team.rank <= 3 ? "top-team" : ""}
+                      >
+                        <td>
+                          <div className="rank-cell">
+                            {getRankIcon(team.rank)}
+                            {/* No rank change display since ranks are fixed from Excel */}
+                          </div>
+                        </td>
+                        <td>
+                          <div className="team-info">
+                            <strong>{team.name}</strong>
+                          </div>
+                        </td>
+                        <td>
+                          <span className="category-badge">{team.category}</span>
+                        </td>
+                        <td>
+                          <span className="criteria-score">
+                            {team.innovationScore}/10
+                          </span>
+                        </td>
+                        <td>
+                          <span className="criteria-score">
+                            {team.technicalScore}/10
+                          </span>
+                        </td>
+                        <td>
+                          <span className="criteria-score">
+                            {team.impactScore}/10
+                          </span>
+                        </td>
+                        <td>
+                          <span className="total-score">{team.totalScore}</span>
+                        </td>
+                        <td>
+                          <span className="file-name" title={team.fileName}>
+                            {team.fileName
+                              ? team.fileName.substring(0, 15) + "..."
+                              : "N/A"}
+                          </span>
+                        </td>
+                        {/* COMMENTED OUT - Qualified Status
                       <td>
                         {team.qualified ? (
                           <span className="badge badge-success">Qualified</span>
@@ -598,28 +625,30 @@ const Leaderboard = () => {
                           </span>
                         )}
                       </td>
-                      <td>
-                        <div className="action-buttons">
-                          <button className="btn btn-secondary btn-sm">
-                            <Eye size={14} />
-                            View
-                          </button>
-                        </div>
+                      */}
+                        <td>
+                          <div className="action-buttons">
+                            <button className="btn btn-secondary btn-sm">
+                              <Eye size={14} />
+                              View
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="10" className="text-center">
+                        No teams found matching the current filters
                       </td>
                     </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="10" className="text-center">
-                      No teams found matching the current filters
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Category-wise Rankings */}
       {viewMode === "category" && (
@@ -688,6 +717,66 @@ const Leaderboard = () => {
                 </div>
               );
             })}
+        </div>
+      )}
+
+      {/* Publish Confirmation Modal */}
+      {showPublishModal && (
+        <div className="modal-overlay" onClick={cancelPublish} style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.7)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{
+            background: 'white',
+            borderRadius: '12px',
+            padding: '32px',
+            maxWidth: '500px',
+            width: '90%',
+            textAlign: 'center'
+          }}>
+            <h2 style={{ marginBottom: '16px', color: '#1f2937' }}>Confirm Publication</h2>
+            <p style={{ marginBottom: '24px', color: '#6b7280' }}>
+              Are you sure you want to publish the leaderboard? Once published, it will be visible to all judges and teams.
+            </p>
+            <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
+              <button
+                onClick={cancelPublish}
+                style={{
+                  padding: '12px 32px',
+                  borderRadius: '8px',
+                  border: '1px solid #d1d5db',
+                  background: 'white',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  color: '#374151'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmPublish}
+                style={{
+                  padding: '12px 32px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  background: '#10b981',
+                  color: 'white',
+                  cursor: 'pointer',
+                  fontWeight: '600'
+                }}
+              >
+                Yes, Publish
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

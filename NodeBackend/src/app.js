@@ -10,7 +10,7 @@ import teamRouter from "./routes/team/user.route.js";
 import judgeEvaluation from "./routes/judge/evaluation.route.js";
 import adminEvaluation from "./routes/admin/evaluation.route.js";
 import teamEvaluation from "./routes/judge/teamEvaluation.route.js";
-import mentorRouter from "./routes/admin/mentor.route.js";
+// import mentorRouter from "./routes/admin/mentor.route.js"; // COMMENTED OUT - Mentor feature disabled
 import pptSubmissionRouter from "./routes/team/pptSubmission.route.js";
 import pptLeaderboardRouter from "./routes/leaderboard/pptLeaderboard.route.js";
 import leaderboardRouter from "./routes/leaderboard.route.js";
@@ -47,7 +47,7 @@ app.use("/judge/evaluation", judgeEvaluation);
 app.use("/admin/evaluation", adminEvaluation);
 app.use("/team", teamRouter);
 app.use("/judge/team-evaluation", teamEvaluation);
-app.use("/mentor", mentorRouter);
+// app.use("/mentor", mentorRouter); // COMMENTED OUT - Mentor feature disabled
 app.use("/team/ppt", pptSubmissionRouter); // Add PPT submission routes
 app.use("/leaderboard", pptLeaderboardRouter);
 

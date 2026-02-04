@@ -5,7 +5,7 @@ import { API_BASE_URL } from "../config";
 
 const ExcelUpload = () => {
   const [excelData, setExcelData] = useState([]);
-  const [file, setFile] = useState(null); // Store selected file
+  const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState(null);
 
@@ -28,25 +28,28 @@ const ExcelUpload = () => {
         throw new Error("The uploaded Excel file is empty.");
       }
 
-      const fileHeaders = Object.keys(jsonData[0]).map((h) =>
-        h.trim().toLowerCase(),
-      );
-      const requiredColumns = [
-        "team name",
-        "team leader email id (gla email id only)",
-      ];
-      const missingColumns = requiredColumns.filter(
-        (col) => !fileHeaders.includes(col),
+      const fileHeaders = Object.keys(jsonData[0]);
+      console.log("Detected headers:", fileHeaders); // Debug log
+
+      // More flexible header checking
+      const hasTeamName = fileHeaders.some(
+        (h) =>
+          h.trim().toLowerCase().includes("team") &&
+          h.trim().toLowerCase().includes("name"),
       );
 
-      if (missingColumns.length > 0) {
+      const hasEmail = fileHeaders.some((h) =>
+        h.trim().toLowerCase().includes("email"),
+      );
+
+      if (!hasTeamName || !hasEmail) {
         throw new Error(
-          `Missing required columns: ${missingColumns.join(", ")}`,
+          `Missing required columns. Found headers: ${fileHeaders.join(", ")}`,
         );
       }
 
       setExcelData(jsonData);
-      setFile(selectedFile); // Store file for later upload
+      setFile(selectedFile);
     } catch (error) {
       console.error("Error reading file:", error);
       setUploadStatus({ type: "error", message: error.message });
@@ -64,29 +67,39 @@ const ExcelUpload = () => {
       formData.append("file", file);
 
       const token = localStorage.getItem("authToken");
-      const response = await fetch(
-        `${API_BASE_URL}/admin/upload/teams`,
-        {
-          method: "POST",
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-          body: formData,
-        },
-      );
+      const response = await fetch(`${API_BASE_URL}/admin/upload/teams`, {
+        method: "POST",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: formData,
+      });
 
       const result = await response.json();
 
       if (!response.ok) {
         throw new Error(
-          result.detail || result.message || "Failed to upload file. Server returned an error.",
+          result.detail ||
+            result.message ||
+            "Failed to upload file. Server returned an error.",
         );
       }
 
       const data = result.data || result;
       setUploadStatus({
         type: "success",
-        message: result.message || `Upload complete: ${data.created || 0} created, ${data.updated || 0} updated`,
-        details: data.skipped || [],
+        message: result.message,
+        details: {
+          created: data.created || 0,
+          updated: data.updated || 0,
+          skipped: data.skipped || [],
+          emailsSent: data.emailsSent || 0,
+          emailsFailed: data.emailsFailed || 0,
+        },
       });
+
+      // Clear the file input after successful upload
+      setFile(null);
+      setExcelData([]);
+      document.getElementById("file-upload").value = "";
     } catch (error) {
       console.error("Error uploading file:", error);
       setUploadStatus({ type: "error", message: error.message });
@@ -101,7 +114,7 @@ const ExcelUpload = () => {
         <h2 className="excel-upload-title">Upload Shortlisted Teams</h2>
 
         <div className="instructions-box">
-          <p className="instructions-title">Instructions:</p>
+          <p className="instructions-title">📋 Instructions:</p>
           <ul className="instructions-list">
             <li>
               Upload Excel file (.xlsx or .xls) with the first sheet containing
@@ -109,10 +122,13 @@ const ExcelUpload = () => {
             </li>
             <li>
               <strong>Required columns</strong> (must be present):
-              <ul className="instructions-sublist"><b>
-                <li>Team Name</li>
-                <li>Team Leader Email id (gla email id only)</li>
-              </b>
+              <ul className="instructions-sublist">
+                <li>
+                  <b>Team Name</b>
+                </li>
+                <li>
+                  <b>Team Leader Email id</b>
+                </li>
               </ul>
             </li>
             <li>
@@ -132,39 +148,111 @@ const ExcelUpload = () => {
               </ul>
             </li>
             <li>
-              Emails must be valid GLA university emails (e.g.,
-              `example@gla.ac.in`).
+              📧 Welcome emails will be sent automatically to new teams with
+              their login credentials.
             </li>
           </ul>
         </div>
 
-        {/* --- Upload Status Display --- */}
+        {/* Upload Status Display */}
         {uploadStatus && (
           <div className={`upload-status ${uploadStatus.type}`}>
-            <p>{uploadStatus.message}</p>
-            {uploadStatus.type === "success" &&
-              uploadStatus.details &&
-              uploadStatus.details.length > 0 && (
-                <div className="skipped-details">
-                  <strong>Skipped Teams:</strong>
-                  <ul>
-                    {uploadStatus.details.map((item, index) => (
-                      <li key={index}>
-                        {item.team_name}: {item.reason}
-                      </li>
-                    ))}
-                  </ul>
+            <p style={{ fontWeight: "bold", marginBottom: "10px" }}>
+              {uploadStatus.message}
+            </p>
+
+            {uploadStatus.type === "success" && uploadStatus.details && (
+              <div style={{ marginTop: "15px" }}>
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+                    gap: "10px",
+                    marginBottom: "15px",
+                  }}
+                >
+                  <div
+                    style={{
+                      background: "#d1fae5",
+                      padding: "10px",
+                      borderRadius: "6px",
+                      textAlign: "center",
+                    }}
+                  >
+                    <strong>✅ Created:</strong> {uploadStatus.details.created}
+                  </div>
+                  <div
+                    style={{
+                      background: "#dbeafe",
+                      padding: "10px",
+                      borderRadius: "6px",
+                      textAlign: "center",
+                    }}
+                  >
+                    <strong>🔄 Updated:</strong> {uploadStatus.details.updated}
+                  </div>
+                  <div
+                    style={{
+                      background: "#fee2e2",
+                      padding: "10px",
+                      borderRadius: "6px",
+                      textAlign: "center",
+                    }}
+                  >
+                    <strong>⏭️ Skipped:</strong>{" "}
+                    {uploadStatus.details.skipped.length}
+                  </div>
+                  <div
+                    style={{
+                      background: "#fef3c7",
+                      padding: "10px",
+                      borderRadius: "6px",
+                      textAlign: "center",
+                    }}
+                  >
+                    <strong>📧 Emails Sent:</strong>{" "}
+                    {uploadStatus.details.emailsSent}
+                  </div>
                 </div>
-              )}
+
+                {uploadStatus.details.skipped.length > 0 && (
+                  <div className="skipped-details">
+                    <strong>⚠️ Skipped Teams:</strong>
+                    <ul style={{ maxHeight: "200px", overflowY: "auto" }}>
+                      {uploadStatus.details.skipped.map((item, index) => (
+                        <li key={index}>
+                          <strong>{item.team_name}:</strong> {item.reason}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {uploadStatus.details.emailsFailed > 0 && (
+                  <div
+                    style={{
+                      background: "#fee2e2",
+                      padding: "10px",
+                      borderRadius: "6px",
+                      marginTop: "10px",
+                    }}
+                  >
+                    <strong>⚠️ Warning:</strong>{" "}
+                    {uploadStatus.details.emailsFailed} email(s) failed to send.
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 
         <div className="mb-6">
           <div
-            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors duration-200 ${loading
-              ? "border-gray-300 bg-gray-50"
-              : "border-gray-300 hover:border-blue-500"
-              }`}
+            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors duration-200 ${
+              loading
+                ? "border-gray-300 bg-gray-50"
+                : "border-gray-300 hover:border-blue-500"
+            }`}
           >
             <input
               type="file"
@@ -176,14 +264,16 @@ const ExcelUpload = () => {
             />
             <label
               htmlFor="file-upload"
-              className={`cursor-pointer flex flex-col items-center ${loading ? "cursor-not-allowed" : ""}`}
+              className={`cursor-pointer flex flex-col items-center ${
+                loading ? "cursor-not-allowed" : ""
+              }`}
             >
               {loading ? (
                 <div className="animate-pulse flex flex-col items-center">
                   <div className="w-12 h-12 mb-3 rounded-full bg-gray-300"></div>
                   <div className="h-4 w-24 bg-gray-300 rounded mb-2"></div>
                   <span className="text-gray-500 font-medium">
-                    Processing...
+                    Processing... This may take a moment.
                   </span>
                 </div>
               ) : (
@@ -222,22 +312,25 @@ const ExcelUpload = () => {
             disabled={!file || loading}
             style={{
               padding: "0.75rem 2rem",
-              background: "#2563eb",
+              background: !file || loading ? "#9ca3af" : "#2563eb",
               color: "#fff",
               border: "none",
               borderRadius: "6px",
               fontWeight: "bold",
               cursor: !file || loading ? "not-allowed" : "pointer",
               opacity: !file || loading ? 0.6 : 1,
+              transition: "all 0.3s ease",
             }}
           >
-            Submit
+            {loading ? "Uploading..." : "Submit & Send Emails"}
           </button>
         </div>
 
         {excelData.length > 0 && (
           <div className="data-table-section">
-            <h3 className="table-title">Preview of Uploaded Data</h3>
+            <h3 className="table-title">
+              📊 Preview of Uploaded Data ({excelData.length} teams)
+            </h3>
             <div className="table-container">
               <table className="data-table">
                 <thead className="table-header">

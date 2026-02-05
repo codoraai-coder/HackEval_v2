@@ -149,7 +149,7 @@ export const uploadTeamsExcel = asyncHandler(async (req, res) => {
           results.updated++;
         } else {
           // Create new team with generated password
-          generatedPassword = `Codora@${Date.now().toString(36).toUpperCase()}`;
+          generatedPassword = `Team@${Date.now().toString(36).toUpperCase()}`;
           isNewTeam = true;
 
           team = await Team.create({
@@ -193,7 +193,7 @@ export const uploadTeamsExcel = asyncHandler(async (req, res) => {
             `Member_${i}_Email`,
           ]);
 
-          // Add member if name exists (email is optional for members in your data)
+          // Add member if name exists
           if (memberName && memberName.toString().trim()) {
             const memberExists = team.members.some(
               (m) =>
@@ -202,13 +202,22 @@ export const uploadTeamsExcel = asyncHandler(async (req, res) => {
             );
 
             if (!memberExists) {
-              team.members.push({
+              const memberData = {
                 name: memberName.toString().trim(),
-                email: memberEmail
-                  ? memberEmail.toString().trim().toLowerCase()
-                  : "",
                 isLeader: false,
-              });
+              };
+
+              // Only add email if it exists and is valid
+              if (memberEmail && memberEmail.toString().trim()) {
+                const emailStr = memberEmail.toString().trim().toLowerCase();
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+                if (emailRegex.test(emailStr)) {
+                  memberData.email = emailStr;
+                }
+              }
+
+              team.members.push(memberData);
             }
           }
         }
@@ -234,7 +243,11 @@ export const uploadTeamsExcel = asyncHandler(async (req, res) => {
           }
         }
       } catch (rowError) {
-        console.error("Row processing error:", rowError);
+        console.error("❌ Row processing error:", {
+          row: row["Team Name"] || row["team name"] || "Unknown",
+          error: rowError.message,
+          stack: rowError.stack,
+        });
         results.skipped.push({
           team_name: row["Team Name"] || row["team name"] || "Unknown",
           reason: rowError.message,

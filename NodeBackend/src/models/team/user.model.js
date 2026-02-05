@@ -100,9 +100,18 @@ const teamMemberSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    required: true,
     trim: true,
     lowercase: true,
+    validate: {
+      validator: function () {
+        // If this is a leader, email is required
+        if (this.isLeader) {
+          return this.email && this.email.length > 0;
+        }
+        return true; // For non-leaders, email is optional
+      },
+      message: "Email is required for team leaders",
+    },
   },
   phone: {
     type: String,

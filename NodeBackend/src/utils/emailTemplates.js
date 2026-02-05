@@ -226,7 +226,13 @@ export const getWelcomeEmailTemplate = (
     <div class="email-container">
         <!-- Header -->
         <div class="header">
-            <img src="cid:codoraLogo" alt="Codora AI Logo" class="logo" />
+            <!-- ✅ Add onerror handler for missing logo -->
+            <img
+                src="cid:codoraLogo"
+                alt="Codora AI Logo"
+                class="logo"
+                onerror="this.style.display='none'"
+            />
             <h1>Welcome to Codora AI Hackathon! 🚀</h1>
             <p>Your journey to innovation starts here</p>
         </div>

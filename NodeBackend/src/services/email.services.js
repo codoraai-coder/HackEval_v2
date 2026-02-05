@@ -13,13 +13,7 @@ export const sendWelcomeEmail = async (teamName, email, password) => {
     const teamPortalUrl =
       process.env.TEAM_PORTAL_URL || "http://localhost:3000/login";
 
-    // Path to the logo image
     const logoPath = path.join(__dirname, "../../images/codoraai.png");
-
-    // Check if logo exists
-    if (!fs.existsSync(logoPath)) {
-      console.warn("Logo file not found at:", logoPath);
-    }
 
     const mailOptions = {
       from: {
@@ -29,20 +23,26 @@ export const sendWelcomeEmail = async (teamName, email, password) => {
       to: email,
       subject: `🎉 Welcome to Codora AI Hackathon - Team ${teamName}`,
       html: getWelcomeEmailTemplate(teamName, email, password, teamPortalUrl),
-      attachments: [
+    };
+
+    // ✅ Only attach logo if file exists
+    if (fs.existsSync(logoPath)) {
+      mailOptions.attachments = [
         {
           filename: "codoraai.png",
           path: logoPath,
-          cid: "codoraLogo", // same cid value as in the html img src
+          cid: "codoraLogo",
         },
-      ],
-    };
+      ];
+    } else {
+      console.warn("Logo file not found at:", logoPath);
+    }
 
     const info = await transporter.sendMail(mailOptions);
     console.log("Welcome email sent successfully:", info.messageId);
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error("Error sending welcome email:", error);
+    console.error("❌ Error sending welcome email:", error);
     throw new Error(`Failed to send welcome email: ${error.message}`);
   }
 };

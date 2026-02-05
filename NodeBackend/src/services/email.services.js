@@ -10,19 +10,28 @@ const __dirname = path.dirname(__filename);
 export const sendWelcomeEmail = async (teamName, email, password) => {
   try {
     const transporter = createTransporter();
-    const teamPortalUrl =
-      process.env.TEAM_PORTAL_URL;
+
+    // Verify transporter configuration (helps surface SMTP auth/connectivity issues early)
+    try {
+      await transporter.verify();
+      console.log("SMTP transporter verified");
+    } catch (verifyErr) {
+      console.warn("SMTP transporter verification failed:", verifyErr.message);
+    }
+    const teamPortalUrl = process.env.TEAM_PORTAL_URL;
 
     const logoPath = path.join(__dirname, "../../images/codoraai.png");
 
     const mailOptions = {
       from: {
-        name: "Codora AI Hackathon",
+        name: process.env.EMAIL_FROM_NAME || "Codora AI Hackathon",
         address: process.env.EMAIL_USER,
       },
       to: email,
       subject: `🎉 Welcome to Codora AI Hackathon - Team ${teamName}`,
       html: getWelcomeEmailTemplate(teamName, email, password, teamPortalUrl),
+      // Plain-text fallback for SMTP / clients that prefer text
+      text: `Hello Team ${teamName},\n\nYour team has been registered for the Codora AI Hackathon.\n\nLogin details:\nEmail: ${email}\nPassword: ${password}\n\nAccess the team portal: ${teamPortalUrl}\n\nPlease change your password after first login.\n\nGood luck!`,
     };
 
     // ✅ Only attach logo if file exists

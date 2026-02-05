@@ -65,7 +65,7 @@ export const uploadTeamsExcel = asyncHandler(async (req, res) => {
           "Team Leader Email id", // Your exact column name
           "Team Leader Email id ", // With trailing space
           "Team Leader Email ID",
-          "Team Leader Email id (gla email id only)",
+          "Team Leader Email id",
           "email",
           "Email",
           "team leader email",
@@ -129,7 +129,7 @@ export const uploadTeamsExcel = asyncHandler(async (req, res) => {
 
         // Check if team already exists
         let team = await Team.findOne({
-          $or: [{ teamName }, { email: email.toLowerCase().trim() }],
+          $and: [{ teamName }, { email: email.toLowerCase().trim() }],
         });
 
         let isNewTeam = false;

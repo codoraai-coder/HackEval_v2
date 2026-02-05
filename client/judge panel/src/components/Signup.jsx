@@ -16,7 +16,7 @@ function SignIn() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:8000/judge/login", {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/judge/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

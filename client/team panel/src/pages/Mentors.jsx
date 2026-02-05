@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import { TeamContext } from "../context/TeamContext";
 
-const API_BASE_URL = "http://localhost:8000"; // Your FastAPI server URL
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL; 
 
 const Mentors = () => {
   const { team } = useContext(TeamContext);

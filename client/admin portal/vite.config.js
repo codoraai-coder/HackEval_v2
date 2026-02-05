@@ -7,13 +7,13 @@ export default defineConfig({
   server: {
     port: 3000,
     open: true,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:8000',
-        changeOrigin: true,
-        secure: false
-      }
-    }
+    // proxy: {
+    //   '/api': {
+    //     target: `${import.meta.env.VITE_API_BASE_URL}`,
+    //     changeOrigin: true,
+    //     secure: false
+    //   }
+    // }
   },
   build: {
     outDir: 'dist',

@@ -86,7 +86,7 @@ const TeamPSUpload = () => {
       formData.append("file", file);
 
       const response = await fetch(
-        "http://localhost:8000/team-ps/upload-excel",
+        `${import.meta.env.VITE_API_BASE_URL}/team-ps/upload-excel`,
         {
           method: "POST",
           body: formData,

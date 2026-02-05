@@ -27,7 +27,7 @@ const FinalSubmissionList = () => {
         setLoading(true);
         setError('');
         const token = localStorage.getItem('authToken');
-        const res = await fetch('http://localhost:8000/admin/dashboard/final-submissions', {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/dashboard/final-submissions`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
 

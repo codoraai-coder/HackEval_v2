@@ -40,7 +40,7 @@ const Dashboard = () => {
       try {
         setPptLoading(true);
         setPptError("");
-        const res = await fetch("http://localhost:8000/leaderboard/ppt");
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/leaderboard/ppt`);
         if (!res.ok) throw new Error("Failed to load PPT leaderboard");
         const data = await res.json();
         // Backend returns ApiResponse wrapper { status, data, message }.
@@ -67,7 +67,7 @@ const Dashboard = () => {
     const fetchActiveRound = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch("http://localhost:8000/round-state/active", {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/round-state/active`, {
           headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         });
         if (!res.ok) return;
@@ -92,7 +92,7 @@ const Dashboard = () => {
     try {
       setRoundBusy(true);
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:8000/round-state/active", {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/round-state/active`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -173,7 +173,7 @@ const Dashboard = () => {
     const fetchStats = async () => {
       try {
         const token = localStorage.getItem("authToken");
-        const res = await fetch("http://localhost:8000/admin/dashboard/stats", {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/dashboard/stats`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         if (!res.ok) return;
@@ -234,7 +234,7 @@ const Dashboard = () => {
     const fetchActivities = async () => {
       try {
         const token = localStorage.getItem("authToken");
-        const res = await fetch("http://localhost:8000/admin/dashboard/activities", {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/dashboard/activities`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         if (!res.ok) return;

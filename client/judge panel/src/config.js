@@ -1,10 +1,10 @@
 export const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+  import.meta.env.VITE_API_BASE_URL;
 
 
 
   // Environment configuration
-// export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+// export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 // Evaluation parameters with weights
 export const EVALUATION_PARAMETERS = {

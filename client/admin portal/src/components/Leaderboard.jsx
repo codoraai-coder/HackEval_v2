@@ -46,7 +46,7 @@ const Leaderboard = () => {
     try {
       setLoading(true);
       setError("");
-      const res = await fetch("http://localhost:8000/leaderboard/ppt");
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/leaderboard/ppt`);
       if (!res.ok) throw new Error("Failed to load leaderboard");
       const response = await res.json();
 
@@ -159,7 +159,7 @@ const Leaderboard = () => {
   const confirmPublish = async () => {
     try {
       // TODO: Call backend API to publish leaderboard
-      // const res = await fetch('http://localhost:8000/admin/leaderboard/publish', {
+      // const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/leaderboard/publish`, {
       //   method: 'POST',
       //   headers: { 'Content-Type': 'application/json' },
       //   body: JSON.stringify({ round: 'PPT', published: true })
@@ -207,7 +207,7 @@ const Leaderboard = () => {
       formData.append("file", uploadFile);
 
       const res = await fetch(
-        "http://localhost:8000/leaderboard/upload-ppt-scores",
+        `${import.meta.env.VITE_API_BASE_URL}/leaderboard/upload-ppt-scores`,
         {
           method: "POST",
           body: formData,

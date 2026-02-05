@@ -40,7 +40,7 @@
 //     const fetchActive = async () => {
 //       try {
 //         const token = localStorage.getItem('authToken');
-//         const res = await fetch('http://localhost:8000/round-state/active', {
+//         const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/round-state/active`, {
 //           headers: token ? { 'Authorization': `Bearer ${token}` } : {}
 //         });
 //         if (!res.ok) return;
@@ -301,7 +301,7 @@ function App() {
     const fetchActive = async () => {
       try {
         const token = localStorage.getItem('authToken');
-        const res = await fetch('http://localhost:8000/round-state/active', {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/round-state/active`, {
           headers: token ? { 'Authorization': `Bearer ${token}` } : {}
         });
         if (!res.ok) return;

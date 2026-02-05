@@ -3,7 +3,7 @@ import { Mail, Lock, Loader, AlertCircle } from "lucide-react";
 import logo from "/images/codoraai.png";
 import "./Auth.css";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const AdminLogin = ({ onLogin }) => {
   const [formData, setFormData] = useState({ email: "", password: "" });

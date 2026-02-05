@@ -3,7 +3,7 @@ import { UserPlus, Mail, Lock, User, AlertCircle, CheckCircle } from "lucide-rea
 import logo from "/images/codoraai.png";
 import "./Auth.css";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const AdminSignup = ({ onSignupSuccess, onBackToLogin, userType = "admin" }) => {
   const [formData, setFormData] = useState({

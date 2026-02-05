@@ -11,7 +11,7 @@ export const sendWelcomeEmail = async (teamName, email, password) => {
   try {
     const transporter = createTransporter();
     const teamPortalUrl =
-      process.env.TEAM_PORTAL_URL || "http://localhost:3000/login";
+      process.env.TEAM_PORTAL_URL;
 
     const logoPath = path.join(__dirname, "../../images/codoraai.png");
 
